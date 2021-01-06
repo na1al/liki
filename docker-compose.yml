@@ -1,0 +1,47 @@
+version: '3.0'
+
+services:
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    container_name: liki_db
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+    ports:
+      - "9997:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: liki
+    networks:
+      - backend
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: liki_web
+    volumes:
+      - ./web:/usr/share/nginx/html
+      - ./web/conf.d:/etc/nginx/conf.d
+      - ./uploads:/var/uploads
+    ports:
+      - "9999:80"
+    networks:
+      - backend
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: liki_app
+    volumes:
+      - ./uploads:/var/uploads
+    ports:
+      - "9998:8080"
+    networks:
+      - backend
+
+networks:
+  backend:
