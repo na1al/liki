@@ -1,6 +1,13 @@
-FROM nginx:1.19.6-alpine
+FROM node:lts-alpine
 
-COPY . /usr/share/nginx/html
+RUN npm install -g vue-cli
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+COPY www /www
+
+WORKDIR /www
+
+RUN npm install
+
+EXPOSE 8080
+CMD [ "npm", "run", "dev" ]
+#CMD [ "sh" ]

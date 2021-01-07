@@ -1,22 +1,27 @@
 package ua.catalog.liki.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
-@Entity
+@EqualsAndHashCode(callSuper = true)
 @Data
+@Entity
 public class Source extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int id;
+    private int id;
 
     @Basic
-    public String url;
+    private String url;
 
     @Basic
-    public Boolean active;
+    private Boolean active;
+
+    @Basic
+    private Long lastModified;
 
     @Column(columnDefinition = "varchar(20)")
     @Enumerated(EnumType.STRING)

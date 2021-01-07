@@ -1,0 +1,5 @@
+#aaa: bbb
+db:
+  url: jdbc:postgresql://localhost:7777/liki
+  user: postgres
+  password: postgres
