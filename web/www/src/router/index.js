@@ -12,7 +12,8 @@ export default new Router({
       component: Index
     },
     {
-      path: '/m',
+      path: '/m/:alias',
+      name: 'medicine',
       component: Medicine
     }
   ]

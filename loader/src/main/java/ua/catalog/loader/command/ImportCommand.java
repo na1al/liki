@@ -11,7 +11,11 @@ import ua.catalog.loader.repository.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class ImportCommand implements Runnable {
@@ -40,12 +44,8 @@ public class ImportCommand implements Runnable {
                 continue;
             }
 
-
             switch (source.getType()) {
-                case MEDICINE -> {
-                    (new MedicineCommand(source)).run();
-                    (new MedicineImageCommand(source)).run();
-                }
+                case MEDICINE -> (new MedicineCommand(source)).run();
                 case PARTNER_MEDICINE -> (new PartnerMedicineCommand(source)).run();
                 case PARTNER_PRICE -> (new PartnerPriceCommand(source)).run();
                 case PHARMACY -> (new PharmacyCommand(source)).run();
@@ -58,76 +58,101 @@ public class ImportCommand implements Runnable {
 
     private final static class MedicineCommand extends AbstractImporter<MedicineDto, Medicine> {
 
-        protected MedicineMapper mapper;
+        private final MedicineMapper mapper;
+        private BatchInsert<Medicine> medicineRepository;
+        private BatchInsert<MedicineImageSource> imageSourceRepository;
+        private BatchInsert<MedicineRegistration> registrationRepository;
+
 
         public MedicineCommand(Source source) throws FileNotFoundException {
-            super(new MedicineRepository(), new Parser<>(MedicineDto.class, source.getUrl()));
+            super(new Parser<>(MedicineDto.class, source.getUrl()));
             mapper = new MedicineMapperImpl();
+            medicineRepository = new MedicineRepository();
+            imageSourceRepository = new MedicineImageSourceRepository();
+            registrationRepository = new MedicineRegistrationRepository();
         }
 
         @Override
         public Medicine cast(MedicineDto dto) {
             return mapper.toEntity(dto);
         }
-    }
-
-    private final static class MedicineImageCommand extends AbstractImporter<MedicineImageDto, MedicineImageSource> {
-
-        protected MedicineMapper mapper;
-
-        public MedicineImageCommand(Source source) throws FileNotFoundException {
-            super(new MedicineImageSourceRepository(), (new Parser<>(MedicineImageDto.class, source.getUrl())).setFilter(entity -> !entity.getImage().isEmpty()));
-            mapper = new MedicineMapperImpl();
-        }
 
         @Override
-        public MedicineImageSource cast(MedicineImageDto dto) {
-            return mapper.toEntity(dto);
+        public void batchInsert(List<Medicine> entities) throws SQLException {
+            medicineRepository.batchInsert(entities);
+
+            List<MedicineImageSource> imageSources = entities.stream().map(Medicine::getImageSource).filter(Objects::nonNull).collect(Collectors.toList());
+            imageSourceRepository.batchInsert(imageSources);
+            imageSources.clear();
+
+            List<MedicineRegistration> registrations = entities.stream().flatMap(e -> e.getMedicineRegistrations().stream().filter(z -> !z.getCode().isEmpty())).collect(Collectors.toList());
+            registrationRepository.batchInsert(registrations);
         }
     }
 
     private final static class PartnerMedicineCommand extends AbstractImporter<PartnerMedicineDto, PartnerMedicine> {
 
         protected PartnerMedicineMapper mapper;
+        private BatchInsert<PartnerMedicine> repository;
 
         public PartnerMedicineCommand(Source source) throws FileNotFoundException {
-            super(new PartnerMedicineRepository(), new Parser<>(PartnerMedicineDto.class, source.getUrl()));
+            super(new Parser<>(PartnerMedicineDto.class, source.getUrl()));
             mapper = new PartnerMedicineMapperImpl();
+            repository = new PartnerMedicineRepository();
         }
 
         @Override
         public PartnerMedicine cast(PartnerMedicineDto dto) {
             return mapper.toEntity(dto);
         }
+
+        @Override
+        public void batchInsert(List<PartnerMedicine> entities) throws SQLException {
+            repository.batchInsert(entities);
+        }
     }
 
     private final static class PartnerPriceCommand extends AbstractImporter<PartnerPriceDto, PartnerPrice> {
 
         protected PartnerMedicineMapper mapper;
+        private BatchInsert<PartnerPrice> repository;
 
         public PartnerPriceCommand(Source source) throws FileNotFoundException {
-            super(new PartnerPriceRepository(), new Parser<>(PartnerPriceDto.class, source.getUrl()));
+            super(new Parser<>(PartnerPriceDto.class, source.getUrl()));
             mapper = new PartnerMedicineMapperImpl();
+            repository = new PartnerPriceRepository();
         }
 
         @Override
         public PartnerPrice cast(PartnerPriceDto dto) {
             return mapper.toEntity(dto);
         }
+
+        @Override
+        public void batchInsert(List<PartnerPrice> entities) throws SQLException {
+            repository.batchInsert(entities);
+        }
     }
 
     private final static class PharmacyCommand extends AbstractImporter<PharmacyDto, Pharmacy> {
 
         protected PharmacyMapper mapper;
+        private BatchInsert<Pharmacy> repository;
 
         public PharmacyCommand(Source source) throws FileNotFoundException {
-            super(new PharmacyRepository(), new Parser<>(PharmacyDto.class, source.getUrl()));
+            super(new Parser<>(PharmacyDto.class, source.getUrl()));
             mapper = new PharmacyMapperImpl();
+            repository = new PharmacyRepository();
         }
 
         @Override
         public Pharmacy cast(PharmacyDto dto) {
             return mapper.toEntity(dto);
+        }
+
+        @Override
+        public void batchInsert(List<Pharmacy> entities) throws SQLException {
+            repository.batchInsert(entities);
         }
     }
 

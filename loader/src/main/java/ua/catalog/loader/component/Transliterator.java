@@ -20,4 +20,13 @@ public class Transliterator {
                 .toLowerCase()
                 .replaceAll("\\b\\w{1,2}\\b\\s?", "");
     }
+
+    public static String urlNormalize(String text){
+        return com.ibm.icu.text.Transliterator
+                .getInstance(TRANSLITERATE_ID + "; " + NORMALIZE_ID)
+                .transliterate(text)
+                .trim()
+                .replaceAll("\\s+", "-")
+                .toLowerCase();
+    }
 }

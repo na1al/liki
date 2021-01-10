@@ -16,15 +16,12 @@ public class Parser<T> {
     @Getter
     CsvToBean<T> reader;
 
-    private String url;
-
     @Setter
     @Getter
     @Accessors(chain = true)
     private Filter<T> filter = entity -> true;
 
     public Parser(Class<T> target, String url) throws FileNotFoundException {
-        this.url = url;
         reader = new CsvToBeanBuilder<T>(new FileReader(url))
                 .withType(target)
                 .build();

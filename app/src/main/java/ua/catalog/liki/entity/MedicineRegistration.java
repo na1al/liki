@@ -6,40 +6,31 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Data
 @Entity
-public class SearchData implements Serializable {
+@Data
+public class MedicineRegistration {
 
-    @JsonIgnore
     @EmbeddedId
     private Id id;
 
-    @Basic(optional = false)
-    private String name;
+//    @JsonIgnore
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "medicine_id", updatable = false, insertable = false)
+//    private Medicine medicine;
 
     @Basic(optional = false)
-    private String alias;
-
-    @Basic
-    private Integer price;
-
-    @Basic
-    private String image;
-
-    @JsonIgnore
-    @Basic(optional = false)
-    private String normalizedText;
-
+    @Column(columnDefinition = "varchar(30)")
+    private String code;
 
     public enum Type {
-        MEDICINE, CATEGORY
+        UA, MORION, OTIMA, BADM
     }
 
     @Data
     @Embeddable
     public static class Id implements Serializable {
 
-        private int entityId;
+        private int medicine_id;
 
         @Column(columnDefinition = "varchar(10)")
         @Enumerated(EnumType.STRING)

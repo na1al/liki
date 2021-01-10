@@ -13,6 +13,14 @@ public class Pharmacy {
 
     private String name;
 
+    private String phone;
+
+    private String schedule;
+
     private String address;
+
+    private Double lat;
+
+    private Double lng;
 
 }

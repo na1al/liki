@@ -9,8 +9,10 @@ import java.util.Date;
 @Entity
 public class City {
 
+    public static final int DEFAULT_CITY_ID = 1116;
+
     @Id
-    private long id;
+    private int id;
 
     @Basic
     private String name;

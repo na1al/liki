@@ -42,6 +42,9 @@ public class Main {
             );
         }
 
+        (new PriceCacheCommand()).run();
+        (new SearchCommand()).run();
+
         if (cmd.hasOption("c")) {
 
             switch (cmd.getOptionValue("c")) {

@@ -1,10 +1,13 @@
 package ua.catalog.liki.entity;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+@JsonIgnoreProperties(value = {"id", "city", "createdAt", "updatedAt"})
 @Data
 @Entity
 public class MedicinePrice extends BaseEntity {
@@ -25,8 +28,10 @@ public class MedicinePrice extends BaseEntity {
     @Data
     @Embeddable
     public static class Id implements Serializable {
-        private long medicine_id;
-        private long city_id;
+        @Column(name = "medicine_id", insertable = false, updatable = false)
+        private int medicineId;
+        @Column(name = "city_id", insertable = false, updatable = false)
+        private int cityId;
     }
 
 }

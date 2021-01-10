@@ -28,8 +28,10 @@ public class PartnerMedicine extends BaseEntity {
     @Data
     @Embeddable
     public static class Id implements Serializable {
-        private long external_medicine_id;
-        private long integration_id;
+        @Column(name = "external_medicine_id")
+        private int externalMedicineId;
+        @Column(name = "integration_id")
+        private int integrationId;
     }
 
 }

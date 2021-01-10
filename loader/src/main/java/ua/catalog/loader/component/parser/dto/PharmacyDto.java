@@ -18,7 +18,27 @@ public class PharmacyDto {
     @CsvBindByName(column = "name")
     private String name;
 
+    @CsvBindByName(column = "phone")
+    private String phone;
+
+    @CsvBindByName(column = "schedule")
+    private String schedule;
+
     @CsvBindByName(column = "address")
     private String address;
+
+    @CsvBindByName(column = "lat")
+    private Double lat;
+
+    @CsvBindByName(column = "lng")
+    private Double lng;
+
+    public void setName(String name) {
+        this.name = name.trim();
+    }
+
+    public void setAddress(String address) {
+        this.address = address.trim();
+    }
 
 }

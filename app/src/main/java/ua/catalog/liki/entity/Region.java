@@ -10,7 +10,7 @@ import java.util.Date;
 public class Region {
 
     @Id
-    private long id;
+    private int id;
 
     @Basic
     private String name;

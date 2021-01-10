@@ -13,7 +13,7 @@ import java.util.Date;
 public class Country {
 
     @Id
-    private long id;
+    private int id;
 
     @Basic
     private String name;

@@ -13,19 +13,21 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: liki
-    networks:
-      - backend
+#    networks:
+#      - backend
 
   web:
     build:
       context: ./web
     container_name: liki_web
+#    network_mode: host
     volumes:
       - ./web/www/src:/www/src
+      - ./web/www/config:/www/config
     ports:
-      - "9999:8080"
-    networks:
-      - backend
+      - "8080:8080"
+#    networks:
+#      - backend
 
 networks:
   backend:
