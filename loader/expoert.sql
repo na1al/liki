@@ -1,5 +1,9 @@
 select id,
        substring(CASE WHEN name_local = '' || name_local IS NULL THEN name ELSE name_local END, 1, 255) as name,
+       unique_number as code_ua,
+       morion_code as code_morion,
+       optima_code as code_optima,
+       badm_code as code_badm,
        description,
        (select concat('https://static.doc.ua', '/', TRIM(BOTH '/' FROM web_url), '/' , file)  from vrachi.media where media.id = media_id and storage = 'S3Storage') as image
 from medicine
