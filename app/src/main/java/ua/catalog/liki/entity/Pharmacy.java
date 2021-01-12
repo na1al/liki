@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Entity
 public class Pharmacy extends BaseEntity implements Serializable {
 
-    @JsonIgnore
     @EmbeddedId
     private PharmacyId id;
 
@@ -43,6 +42,7 @@ public class Pharmacy extends BaseEntity implements Serializable {
     @Data
     @Embeddable
     public static class PharmacyId implements Serializable {
+        @JsonIgnore
         @Column(name = "external_pharmacy_id")
         private int externalPharmacyId;
         @Column(name = "integration_id")

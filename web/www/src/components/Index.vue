@@ -1,7 +1,7 @@
 <template>
 
   <div class="container catalog" >
-    <div class="row row-cols-5" v-if="medicines">
+    <div class="row  row-cols-xl-5 row-cols-lg-4  row-cols-md-3 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
       <div class="col mb-3" v-for="item in medicines">
 
         <div class="card" style="cursor: pointer;" v-on:click="view(item.alias)">

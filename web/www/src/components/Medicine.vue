@@ -32,8 +32,12 @@
 
       <div v-if="prices" class="mt-5">
 
+
+
+
         <div class="d-flex position-relative border p-2 mb-2 rounded" v-for="item in prices" >
-          <img src="/empty.png" class="flex-shrink-0 me-3" alt="..." width="40" height="40">
+
+          <img src="/empty.png" v-bind:src="'/logos/'+item.pharmacy.id.integrationId+'.jpg'" class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
           <div>
             <h5 class="mt-0">{{item.pharmacy.name}}</h5>
             <span class="fw-light">{{item.pharmacy.address}} <span v-if="item.pharmacy.phone">тел.: {{item.pharmacy.phone | truncate(60, '...')}}</span></span>
