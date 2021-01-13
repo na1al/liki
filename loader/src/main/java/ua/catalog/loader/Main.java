@@ -43,7 +43,7 @@ public class Main {
         }
 
         (new PriceCacheCommand()).run();
-        (new SearchCommand()).run();
+       // (new SearchCommand()).run();
 
         if (cmd.hasOption("c")) {
 

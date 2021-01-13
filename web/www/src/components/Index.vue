@@ -1,6 +1,13 @@
 <template>
 
+
+
+
   <div class="container catalog" >
+
+
+    <Search/>
+
     <div class="row  row-cols-xl-5 row-cols-lg-4  row-cols-md-3 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
       <div class="col mb-3" v-for="item in medicines">
 
@@ -29,9 +36,10 @@
 </template>
 
 <script>
+import Search from './header/Search'
 import App from "../App";
 export default {
-  components: {App},
+  components: {App,Search},
   data() {
     return {
       loading: true,

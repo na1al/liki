@@ -1,6 +1,6 @@
 <template>
 
-  <div class="container mt-5">
+  <div class=" mt-5">
 
     <div class="w-25 mb-3">
 

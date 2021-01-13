@@ -22,6 +22,7 @@ services:
     container_name: liki_web
 #    network_mode: host
     volumes:
+      - ./web/www/package.json:/www/package.json
       - ./web/www/src:/www/src
       - ./web/www/config:/www/config
     ports:
