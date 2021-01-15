@@ -1,20 +1,31 @@
 <template></template>
 <script>
 export default {
-  inject: ["google", "map"],
   props: {
-    position: Object
+    google: {
+      type: Object,
+      required: true
+    },
+    map: {
+      type: Object,
+      required: true
+    },
+    position: Object,
+    onClick: Function
   },
-  data(){
-    return { marker: null}
-  },
-  mounted(){
-    const { Marker } = this.google.maps
-    this.marker = new Marker({
+  mounted() {
+    let marker = new this.google.maps.Marker({
       position: this.position,
+      click: true,
       map: this.map,
-      title: "Child marker!"
-    })
-  }
+      //  icon: POINT_MARKER_ICON_CONFIG
+    });
+
+    if (this.onClick) {
+      marker.addListener("click", () => {
+        this.onClick()
+      });
+    }
+  },
 }
 </script>

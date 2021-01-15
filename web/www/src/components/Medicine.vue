@@ -62,7 +62,7 @@
     </div>
 
 
-    <div class="map-container">
+    <div class="map-container" v-if="markers.length">
       <Addresses :markers="markers"/>
     </div>
 
@@ -71,25 +71,6 @@
 
 
 </template>
-
-
-<style>
-
-.view {
-  width: 50%;
-  float: left;
-}
-
-.map-container {
-  height: 100%;
-  width: 50%;
-  float: right;
-  position: fixed;
-  right: 0px;
-}
-
-</style>
-
 
 <script>
 
@@ -117,12 +98,14 @@ export default {
   },
   methods: {
     fetchMedicine: function () {
+      let that = this;
       this.alias = this.$route.params.alias
       fetch('/v1/medicine/alias/' + this.alias)
           .then(res => res.json())
           .then(res => {
             this.medicine = res.data;
             this.fetchMedicinePrices();
+          //  self.markersa = [{lat: 50.450277660594104, lng: 30.5217538863496}]
           });
     },
     fetchMedicinePrices: function () {
@@ -137,6 +120,7 @@ export default {
                 lng: res.data[i].pharmacy.lng,
               };
             }
+            console.log('Markers fetched');
           });
     }
   }
@@ -145,21 +129,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
+.view {
+  width: 50%;
+  float: left;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
+.map-container {
+  height: 100%;
+  width: 50%;
+  float: right;
+  position: fixed;
+  right: 0px;
 }
 </style>
+
+
