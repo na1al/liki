@@ -41,7 +41,6 @@ export default {
   },
   watch: {
     showMarkerId: function (newVal, oldVal) {
-      console.log(newVal)
        this.infoId = newVal;
        this.infoPosition = this.markers[newVal].position;
        this.infoContent = this.markers[newVal].content;

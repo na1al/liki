@@ -7,6 +7,9 @@
 
       <div class="container">
         <Search/>
+        <Breadcrumb :items="breadcrumbs()"/>
+
+
         <div class="medicine" v-if="medicine">
 
 
@@ -39,7 +42,8 @@
             <h4 class="alert-heading">{{ medicine.name }}</h4>
             <p>Данний препарат незнайдений в жодній із аптек.</p>
             <hr>
-            <p class="mb-0">Ви можете перейти до категорії `Назва категоріі` для пошуку анологів чи скористатись пошуком.</p>
+            <p class="mb-0">Ви можете перейти до категорії `Назва категоріі` для пошуку анологів чи скористатись
+              пошуком.</p>
           </div>
 
 
@@ -92,7 +96,6 @@
           </div><!-- if prices -->
 
 
-
         </div>
 
       </div>
@@ -117,6 +120,7 @@
 
 import Search from './header/Search'
 import Addresses from './map/AddressMap'
+import Breadcrumb from './Breadcrumb'
 
 
 export default {
@@ -131,7 +135,7 @@ export default {
       addressComponentVersion: 0,
     }
   },
-  components: {Search, Addresses},
+  components: {Search, Addresses, Breadcrumb},
   created() {
     this.loading = true;
     this.fetchMedicine();
@@ -140,6 +144,24 @@ export default {
     '$route': 'fetchMedicine'
   },
   methods: {
+    breadcrumbs: function () {
+      return [
+        {
+          title: "Головна",
+          url: "/",
+        },
+        {
+          title: "Каталог",
+          url: "/#/catalog",
+        },
+        {
+          title: "Назва категоріі",
+        },
+        {
+          title: this.medicine ? this.medicine.name: '',
+        }
+      ];
+    },
     showInfoWindow: function (index) {
       this.showMarkerId = parseInt(index);
     },

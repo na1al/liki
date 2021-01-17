@@ -55,8 +55,6 @@ export default {
         pager.push(i);
       }
 
-      console.log(pager)
-
       return pager;
     }
   }

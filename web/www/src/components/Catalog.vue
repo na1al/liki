@@ -7,7 +7,7 @@
 
       <div class="container">
         <Search/>
-
+        <Breadcrumb :items="breadcrumbs()"/>
 
         <div class="medicine border rounded mb-2 p-2" style="cursor: pointer" v-for="medicine in medicines"
              v-on:click="view(medicine.alias)">
@@ -61,6 +61,7 @@
 import Search from './header/Search'
 import Pager from './Pager'
 import Addresses from './map/AddressMap'
+import Breadcrumb from './Breadcrumb'
 
 export default {
   data() {
@@ -71,7 +72,7 @@ export default {
       totalPages: null
     }
   },
-  components: {Search, Addresses, Pager},
+  components: {Search, Addresses, Pager, Breadcrumb},
   created() {
     this.loading = true;
     this.fetchMedicine();
@@ -80,6 +81,17 @@ export default {
     '$route': 'fetchMedicine'
   },
   methods: {
+    breadcrumbs: function () {
+      return [
+        {
+          title: "Головна",
+          url: "/",
+        },
+        {
+          title: "Каталог"
+        }
+      ];
+    },
     view: function (alias) {
       this.$router.push({name: 'medicine', params: {alias: alias}})
     },
