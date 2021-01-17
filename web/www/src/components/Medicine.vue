@@ -35,25 +35,63 @@
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
+          <div class="alert alert-success mt-4" role="alert" v-else-if="!this.prices || !this.prices.size">
+            <h4 class="alert-heading">{{ medicine.name }}</h4>
+            <p>Данний препарат незнайдений в жодній із аптек.</p>
+            <hr>
+            <p class="mb-0">Ви можете перейти до категорії `Назва категоріі` для пошуку анологів чи скористатись пошуком.</p>
+          </div>
 
 
-          <div v-if="prices" class="mt-5">
+          <div v-if="this.prices && this.prices.size" class="mt-5">
 
 
-            <div class="d-flex position-relative border p-2 mb-2 rounded" v-for="item in prices">
-              <img src="/empty.png" v-bind:src="'/logos/'+item.pharmacy.id.integrationId+'.jpg'"
-                   class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
-              <div>
-                <h5 class="mt-0">{{ item.pharmacy.name }}</h5>
-                <span class="fw-light">{{ item.pharmacy.address }} <span
-                    v-if="item.pharmacy.phone">тел.: {{ item.pharmacy.phone | truncate(60, '...') }}</span></span>
+            <div class="accordion" id="accordionExample">
+
+              <div class="accordion-item" v-for="group in prices.values()">
+
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                          v-bind:data-bs-target="'#collapse'+group.pharmacy.id.integrationId" aria-expanded="true"
+                          aria-controls="collapseOne">
+
+                    <img src="/empty.png" v-bind:src="'/logos/'+group.pharmacy.id.integrationId+'.jpg'"
+                         class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
+                    {{ group.pharmacy.name }} <span class="fw-bold ms-auto"> від {{
+                      group.minPrice | formatPrice
+                    }} </span>
+                  </button>
+                </h2>
+
+                <div v-bind:id="'collapse'+group.pharmacy.id.integrationId" class="accordion-collapse collapse"
+                     aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+
+
+                  <div class="d-flex position-relative border-bottom p-3 " style="cursor: pointer"
+                       v-for="item in group.items" v-if="item.pharmacy.lat"
+                       v-on:click="showInfoWindow(item.index)">
+                    <img src="/empty.png" v-bind:src="'/logos/'+item.pharmacy.id.integrationId+'.jpg'"
+                         class="flex-shrink-0 rounded me-3" alt="..." width="30" height="30">
+                    <div>
+                      <h5 class="mt-0">{{ item.pharmacy.name }}</h5>
+                      <span class="fw-light">{{ item.pharmacy.address }} <span
+                          v-if="item.pharmacy.phone">тел.: {{ item.pharmacy.phone | truncate(60, '...') }}</span></span>
+                    </div>
+                    <span class="ms-auto fs-6">від {{ item.price | formatPrice }}</span>
+                  </div>
+
+
+                </div>
+
               </div>
-              <span class="ms-auto fs-6">{{ item.price | formatPrice }}</span>
 
 
             </div>
 
-          </div>
+
+          </div><!-- if prices -->
+
+
 
         </div>
 
@@ -62,10 +100,13 @@
     </div>
 
 
-    <div class="map-container" v-if="markers.length">
-      <Addresses :markers="markers"/>
+    <div class="map-container" v-if="addressComponentVersion">
+      <Addresses
+          :key="addressComponentVersion"
+          :markers="markers"
+          :show-marker-id="showMarkerId"
+      />
     </div>
-
 
   </div>
 
@@ -85,7 +126,9 @@ export default {
       alias: null,
       medicine: null,
       markers: [],
-      prices: []
+      showMarkerId: null,
+      prices: null,
+      addressComponentVersion: 0,
     }
   },
   components: {Search, Addresses},
@@ -97,6 +140,9 @@ export default {
     '$route': 'fetchMedicine'
   },
   methods: {
+    showInfoWindow: function (index) {
+      this.showMarkerId = parseInt(index);
+    },
     fetchMedicine: function () {
       let that = this;
       this.alias = this.$route.params.alias
@@ -105,7 +151,6 @@ export default {
           .then(res => {
             this.medicine = res.data;
             this.fetchMedicinePrices();
-          //  self.markersa = [{lat: 50.450277660594104, lng: 30.5217538863496}]
           });
     },
     fetchMedicinePrices: function () {
@@ -113,21 +158,49 @@ export default {
           .then(res => res.json())
           .then(res => {
             this.loading = false;
-            this.prices = res.data;
+            this.prices = new Map();
+
+            for (let i in res.data) {
+
+              let item = res.data[i];
+              let groupId = item.pharmacy.id.integrationId;
+
+              if (!this.prices.has(groupId)) {
+                this.prices.set(groupId, {
+                  pharmacy: item.pharmacy,
+                  minPrice: 0,
+                  items: []
+                })
+              }
+
+              let group = this.prices.get(groupId);
+              item.index = i;
+              group.items[group.items.length] = item;
+
+              if (!group.minPrice || group.minPrice < item.price) {
+                group.pharmacy = item.pharmacy;
+                group.minPrice = item.price;
+              }
+
+            }
+
             for (let i in res.data) {
               this.markers[i] = {
-                lat: res.data[i].pharmacy.lat,
-                lng: res.data[i].pharmacy.lng,
+                content: '<h5>' + res.data[i].pharmacy.name + '</h5><p>' + res.data[i].pharmacy.address + '</p><p>' + (res.data[i].pharmacy.phone ? res.data[i].pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(res.data[i].price) + '</div>',
+                position: {
+                  lat: res.data[i].pharmacy.lat,
+                  lng: res.data[i].pharmacy.lng,
+                }
               };
             }
-            console.log('Markers fetched');
+            this.addressComponentVersion++;
           });
     }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
 .view {
   width: 50%;
@@ -141,6 +214,16 @@ export default {
   position: fixed;
   right: 0px;
 }
+
+.accordion-button::after {
+  display: none;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #000;
+  background-color: #fff;
+}
+
 </style>
 
 

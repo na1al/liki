@@ -8,28 +8,21 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.*;
 import ua.catalog.liki.views.MedicineView;
-import ua.catalog.liki.views.View;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
-import static javax.persistence.ConstraintMode.PROVIDER_DEFAULT;
 
 @JsonIgnoreProperties(value = {"priority","createdAt", "updatedAt"})
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(indexes = {
-        @Index(name = "idx_medicine_alias", columnList = "alias", unique = true)
+        @Index(name = "idx_medicine_alias", columnList = "alias", unique = true),
+        @Index(name = "idx_medicine_priority", columnList = "priority")
 })
 public class Medicine extends BaseEntity {
 
@@ -48,7 +41,7 @@ public class Medicine extends BaseEntity {
     @Where(clause = "city_id=" + City.DEFAULT_CITY_ID)
     private Set<MedicinePrice> prices = new HashSet<>();
 
-    @JsonView(MedicineView.View.class)
+    @JsonView({MedicineView.View.class, MedicineView.List.class})
     @OneToMany
     @BatchSize(size = 20)
     @JoinColumn(name = "medicine_id")
@@ -64,7 +57,7 @@ public class Medicine extends BaseEntity {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Basic
-    private Short priority;
+    @Column(columnDefinition = "int NOT NULL DEFAULT 0")
+    private int priority;
 
 }

@@ -42,13 +42,13 @@ public class MedicineController {
 
     @GetMapping("/medicine/alias/{alias}")
     public Response<Medicine> view(@PathVariable("alias") String alias, Response<Medicine> model) {
-        model.data = medicineService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Medicine not found"));
+        model.data = medicineService.viewByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Medicine not found"));
         return model;
     }
 
     @GetMapping("/medicine/{id}")
     public Response<Medicine> view(@PathVariable("id") int id, Response<Medicine> model) {
-        model.data = medicineService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Medicine not found"));
+        model.data = medicineService.viewById(id).orElseThrow(() -> new ResourceNotFoundException("Medicine not found"));
         return model;
     }
 

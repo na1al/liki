@@ -1,10 +1,7 @@
 package ua.catalog.loader;
 
 import org.apache.commons.cli.*;
-import ua.catalog.loader.command.ImageCommand;
-import ua.catalog.loader.command.ImportCommand;
-import ua.catalog.loader.command.PriceCacheCommand;
-import ua.catalog.loader.command.SearchCommand;
+import ua.catalog.loader.command.*;
 import ua.catalog.loader.core.config.Config;
 import ua.catalog.loader.core.db.Db;
 
@@ -23,7 +20,7 @@ public class Main {
 
         Options options = new Options();
         options.addOption("h", "help", false, "Output help");
-        options.addOption("c", "command", true, "Commands: import, price, image, search");
+        options.addOption("c", "command", true, "Commands: import, price, image, search, priority");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -42,8 +39,9 @@ public class Main {
             );
         }
 
-        (new PriceCacheCommand()).run();
+       // (new PriceCacheCommand()).run();
        // (new SearchCommand()).run();
+        (new PriorityCommand()).run();
 
         if (cmd.hasOption("c")) {
 
@@ -52,6 +50,7 @@ public class Main {
                 case "price" -> (new PriceCacheCommand()).run();
                 case "image" -> (new ImageCommand()).run();
                 case "search" -> (new SearchCommand()).run();
+                case "priority" -> (new PriorityCommand()).run();
             }
 
         }

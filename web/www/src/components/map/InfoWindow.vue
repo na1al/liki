@@ -14,21 +14,23 @@ export default {
       type: Object,
       required: true
     },
-    opened: Boolean
+    show: Number,
+    position: Object,
+    content: String
   },
   data: function () {
     return {
-      info: null
+      infoWindow: null,
     }
   },
   mounted() {
-    this.info = new this.google.maps.InfoWindow({
-      content:"asdasdasdas"
-    });
+    this.infoWindow = new this.google.maps.InfoWindow({});
   },
   watch: {
-    opened: function(newVal, oldVal) {
-      console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+    show: function (newVal, oldVal) {
+      this.infoWindow.setContent(this.content);
+      this.infoWindow.setPosition(this.position);
+      this.infoWindow.open(this.map);
     }
   }
 }

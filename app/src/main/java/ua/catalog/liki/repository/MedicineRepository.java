@@ -21,7 +21,7 @@ public interface MedicineRepository extends JpaRepository<Medicine, Integer>, Pa
     public Optional<Medicine> findOneByAlias(String alias);
 
     @EntityGraph(attributePaths = {"media"})
-    @Query(value = "SELECT m FROM Medicine m ", countQuery = "SELECT count(m) FROM Medicine m ")
+    @Query(value = "SELECT m FROM Medicine m ORDER BY m.priority DESC ", countQuery = "SELECT count(m) FROM Medicine m ")
     Page<Medicine> findAllCatalog(Pageable pageable);
 
     @EntityGraph(attributePaths = {"media"})

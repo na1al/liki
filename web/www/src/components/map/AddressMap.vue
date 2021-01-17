@@ -4,17 +4,21 @@
       apiKey="AIzaSyCybOzOBA-Z0LRO7m-huOKGAl6sYjqeeuo"
   >
     <template slot-scope="{ google, map }">
-      <div v-for="marker in markers">
+      <div v-for="(marker, index) in markers">
         <PointMarker
-            :position="marker"
             :google="google"
             :map="map"
-            @click="showInfo"
+            :id="index"
+            :position="marker.position"
+            :on-click="markerClick"
         />
       </div>
-      <InfoWindow :google="google"
-                  :map="map"
-                  :opened="showInfoProp"
+      <InfoWindow
+          :google="google"
+          :map="map"
+          :show="infoId"
+          :position="infoPosition"
+          :content="infoContent"
       />
     </template>
   </MapLoader>
@@ -26,31 +30,39 @@ import PointMarker from './PointMarker'
 import InfoWindow from './InfoWindow'
 
 export default {
-  props: {
-    markers: Array
-  },
-  data() {
-    return {
-      showInfoProp: true,
-      info: {
-        lat: 50.450277660594104,
-        lng: 30.5217538863496
-      },
-      mapConfig: {
-        zoom: 13,
-        center: {lat: 50.450277660594104, lng: 30.5217538863496}
-      }
-    }
-  },
   components: {
     MapLoader,
     PointMarker,
     InfoWindow
   },
+  props: {
+    markers: Array,
+    showMarkerId: Number
+  },
+  watch: {
+    showMarkerId: function (newVal, oldVal) {
+      console.log(newVal)
+       this.infoId = newVal;
+       this.infoPosition = this.markers[newVal].position;
+       this.infoContent = this.markers[newVal].content;
+    }
+  },
+  data() {
+    return {
+      mapConfig: {
+        zoom: 13,
+        center: {lat: 50.450277660594104, lng: 30.5217538863496}
+      },
+      infoId: null,
+      infoPosition: null,
+      infoContent: null
+    }
+  },
   methods: {
-    showInfo: function (state) {
-      console.log("aaaaa");
-      // this.showInfoProp = true;
+    markerClick: function (component) {
+      this.infoId = component.id;
+      this.infoPosition = this.markers[component.id].position;
+      this.infoContent = this.markers[component.id].content;
     }
   }
 }

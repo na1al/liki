@@ -10,20 +10,25 @@ export default {
       type: Object,
       required: true
     },
+    id: Number,
     position: Object,
     onClick: Function
   },
+  data: function () {
+    return {
+      marker: null
+    }
+  },
   mounted() {
-    let marker = new this.google.maps.Marker({
+    this.marker = new this.google.maps.Marker({
       position: this.position,
-      click: true,
       map: this.map,
       //  icon: POINT_MARKER_ICON_CONFIG
     });
 
     if (this.onClick) {
-      marker.addListener("click", () => {
-        this.onClick()
+      this.marker.addListener("click", () => {
+        this.onClick(this)
       });
     }
   },

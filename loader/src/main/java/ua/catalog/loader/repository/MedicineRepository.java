@@ -1,5 +1,6 @@
 package ua.catalog.loader.repository;
 
+import ua.catalog.loader.component.Transliterator;
 import ua.catalog.loader.entity.Medicine;
 
 import java.sql.PreparedStatement;
@@ -18,7 +19,6 @@ public class MedicineRepository extends AbstractRepository implements BatchInser
         ResultSet rs = ps.executeQuery();
 
         if (!rs.next()) return null;
-
 
 
         Medicine entity = new Medicine();
@@ -83,6 +83,21 @@ public class MedicineRepository extends AbstractRepository implements BatchInser
         connection.commit();
         connection.setAutoCommit(true);
 
+    }
+
+    public void prioritiesUpdate() throws SQLException {
+
+        PreparedStatement ps = connection.prepareStatement("insert into medicine (id, priority, name) " +
+                "    (select medicine_id as id , " +
+                "           rank() OVER (ORDER BY week) as priority, " +
+                "           '' as name " +
+                "     from medicine_views)" +
+                "   on conflict (id) do update " +
+                "set priority = excluded.priority");
+        ps.execute();
+
+//        ps = connection.prepareStatement("update medicine_views SET week = 0");
+//        ps.execute();
     }
 
 }

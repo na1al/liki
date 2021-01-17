@@ -26,4 +26,8 @@ public class MedicineService {
         searchDataRepository.indexSearchData();
     }
 
+    public void priorityUpdate() throws SQLException {
+        medicineRepository.prioritiesUpdate();
+    }
+
 }
