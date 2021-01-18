@@ -49,6 +49,8 @@ public class ImportCommand implements Runnable {
                 case PARTNER_MEDICINE -> (new PartnerMedicineCommand(source)).run();
                 case PARTNER_PRICE -> (new PartnerPriceCommand(source)).run();
                 case PHARMACY -> (new PharmacyCommand(source)).run();
+                case TAG -> (new TagCommand(source)).run();
+                case MEDICINE_TAGS -> (new MedicineTagsCommand(source)).run();
             }
 
             source.setLastModified(file.lastModified());
@@ -87,6 +89,50 @@ public class ImportCommand implements Runnable {
 
             List<MedicineRegistration> registrations = entities.stream().flatMap(e -> e.getMedicineRegistrations().stream().filter(z -> !z.getCode().isEmpty())).collect(Collectors.toList());
             registrationRepository.batchInsert(registrations);
+        }
+    }
+
+    private final static class TagCommand extends AbstractImporter<TagDto, Tag> {
+
+        protected TagMapper mapper;
+        private BatchInsert<Tag> repository;
+
+        public TagCommand(Source source) throws FileNotFoundException {
+            super(new Parser<>(TagDto.class, source.getUrl()));
+            mapper = new TagMapperImpl();
+            repository = new TagRepository();
+        }
+
+        @Override
+        public Tag cast(TagDto dto) {
+            return mapper.toEntity(dto);
+        }
+
+        @Override
+        public void batchInsert(List<Tag> entities) throws SQLException {
+            repository.batchInsert(entities);
+        }
+    }
+
+    private final static class MedicineTagsCommand extends AbstractImporter<MedicineTagsDto, MedicineTags> {
+
+        protected TagMapper mapper;
+        private BatchInsert<MedicineTags> repository;
+
+        public MedicineTagsCommand(Source source) throws FileNotFoundException {
+            super(new Parser<>(MedicineTagsDto.class, source.getUrl()));
+            mapper = new TagMapperImpl();
+            repository = new MedicineTagsRepository();
+        }
+
+        @Override
+        public MedicineTags cast(MedicineTagsDto dto) {
+            return mapper.toEntity(dto);
+        }
+
+        @Override
+        public void batchInsert(List<MedicineTags> entities) throws SQLException {
+            repository.batchInsert(entities);
         }
     }
 

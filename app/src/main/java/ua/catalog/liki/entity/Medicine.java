@@ -60,4 +60,7 @@ public class Medicine extends BaseEntity {
     @Column(columnDefinition = "int NOT NULL DEFAULT 0")
     private int priority;
 
+    @ManyToMany
+    private Set<Tag> tags = new HashSet<>();
+
 }

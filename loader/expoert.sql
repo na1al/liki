@@ -61,6 +61,13 @@ select pharmacy_id as integration_id,
            WHEN city_id = 96 THEN 2288
            ELSE NULL
            END     as city_id
-from pharmacy_affiliate where pharmacy_id > 0
+from pharmacy_affiliate where pharmacy_id > 0;
+
+
+select model_id as external_id, value as name, 1 as tag_vocabulary_id
+from translation
+where model_class = 'PopularCategory'
+  and field = 'name'
+  and model_id in ( select id from apteka.popular_category where popular = 1)
 
 

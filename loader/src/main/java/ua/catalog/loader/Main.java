@@ -41,7 +41,9 @@ public class Main {
 
        // (new PriceCacheCommand()).run();
        // (new SearchCommand()).run();
-        (new PriorityCommand()).run();
+      //  (new PriorityCommand()).run();
+
+        (new ImportCommand()).run();
 
         if (cmd.hasOption("c")) {
 

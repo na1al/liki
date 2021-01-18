@@ -16,6 +16,6 @@ public class Source {
     private Type type;
 
     public enum Type {
-        MEDICINE, PARTNER_MEDICINE, PARTNER_PRICE, PHARMACY
+        MEDICINE, PARTNER_MEDICINE, PARTNER_PRICE, PHARMACY, MEDICINE_TAGS, TAG
     }
 }
