@@ -61,6 +61,6 @@ public class Medicine extends BaseEntity {
     private int priority;
 
     @ManyToMany
-    private Set<Tag> tags = new HashSet<>();
+    private Set<Tag> tag = new HashSet<>();
 
 }

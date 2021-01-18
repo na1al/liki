@@ -1,15 +1,14 @@
 package ua.catalog.loader.repository;
 
-import ua.catalog.loader.entity.MedicineTags;
-import ua.catalog.loader.entity.Tag;
+import ua.catalog.loader.entity.MedicineTag;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class MedicineTagsRepository extends AbstractRepository implements BatchInsert<MedicineTags> {
+public class MedicineTagRepository extends AbstractRepository implements BatchInsert<MedicineTag> {
 
-    public void batchInsert(List<MedicineTags> items) throws SQLException {
+    public void batchInsert(List<MedicineTag> items) throws SQLException {
 
         if (items.isEmpty()) {
             return;
@@ -21,7 +20,7 @@ public class MedicineTagsRepository extends AbstractRepository implements BatchI
 
         connection.setAutoCommit(false);
 
-        for (MedicineTags item : items) {
+        for (MedicineTag item : items) {
             ps.setInt(3, item.getTagVocabularyId());
             ps.setInt(4, item.getExternalId());
             ps.addBatch();

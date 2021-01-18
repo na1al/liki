@@ -27,7 +27,11 @@ public abstract class AbstractImporter<F, T> implements Importer<F, T> {
 
             if (!parser.getFilter().check(entity)) continue;
 
-            entities.add(cast(entity));
+            var obj = cast(entity);
+
+            if(obj != null){
+                entities.add(obj);
+            }
 
             if (entities.size() == BATCH_SIZE) {
                 batchInsert(entities);

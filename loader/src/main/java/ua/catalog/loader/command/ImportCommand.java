@@ -12,8 +12,8 @@ import ua.catalog.loader.repository.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -114,24 +114,48 @@ public class ImportCommand implements Runnable {
         }
     }
 
-    private final static class MedicineTagsCommand extends AbstractImporter<MedicineTagsDto, MedicineTags> {
+    private final static class MedicineTagsCommand extends AbstractImporter<MedicineTagDto, MedicineTag> {
 
         protected TagMapper mapper;
-        private BatchInsert<MedicineTags> repository;
+        private BatchInsert<MedicineTag> repository;
+        private TagRepository tagRepository;
+        private Map<Integer, Map<Integer, Integer>> tagCascadeIndex = null;
 
         public MedicineTagsCommand(Source source) throws FileNotFoundException {
-            super(new Parser<>(MedicineTagsDto.class, source.getUrl()));
+            super(new Parser<>(MedicineTagDto.class, source.getUrl()));
             mapper = new TagMapperImpl();
-            repository = new MedicineTagsRepository();
+            repository = new MedicineTagRepository();
+            tagRepository = new TagRepository();
         }
 
         @Override
-        public MedicineTags cast(MedicineTagsDto dto) {
-            return mapper.toEntity(dto);
+        public MedicineTag cast(MedicineTagDto dto) throws SQLException {
+
+            if (tagCascadeIndex == null) {
+                tagCascadeIndex = tagRepository.getTagCascadeIndex();
+            }
+
+            Map<Integer, Integer> map = tagCascadeIndex.get(dto.getTagVocabularyId());
+
+            if (map == null) {
+                return null;
+            }
+
+            Integer tagId = map.get(dto.getExternalId());
+
+            if (tagId == null) {
+                return null;
+            }
+
+            MedicineTag tag = new MedicineTag();
+            tag.setMedicineId(dto.getExternalId());
+            tag.setTagId(tagId);
+
+            return tag;
         }
 
         @Override
-        public void batchInsert(List<MedicineTags> entities) throws SQLException {
+        public void batchInsert(List<MedicineTag> entities) throws SQLException {
             repository.batchInsert(entities);
         }
     }

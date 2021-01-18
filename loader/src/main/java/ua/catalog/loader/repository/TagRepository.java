@@ -1,11 +1,29 @@
 package ua.catalog.loader.repository;
 
 import ua.catalog.loader.entity.Tag;
+
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TagRepository extends AbstractRepository implements BatchInsert<Tag> {
+
+    public Map<Integer, Map<Integer, Integer>> getTagCascadeIndex() throws SQLException {
+
+        Map<Integer, Map<Integer, Integer>> index = new HashMap<>();
+
+        PreparedStatement ps = connection.prepareStatement("SELECT id, tag_vocabulary_id, external_id FROM tag");
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            index.put(rs.getInt("tag_vocabulary_id"),Map.of(rs.getInt("external_id"), rs.getInt("id")));
+        }
+
+        return index;
+    }
 
     public void batchInsert(List<Tag> items) throws SQLException {
 

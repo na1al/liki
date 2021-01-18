@@ -4,7 +4,7 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 
 @Data
-public class MedicineTagsDto {
+public class MedicineTagDto {
 
     @CsvBindByName(column = "medicine_id")
     private int medicineId;
