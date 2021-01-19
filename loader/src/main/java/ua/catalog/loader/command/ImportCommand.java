@@ -141,14 +141,14 @@ public class ImportCommand implements Runnable {
                 return null;
             }
 
-            Integer tagId = map.get(dto.getExternalId());
+            Integer tagId = map.get(dto.getExternalTagId());
 
             if (tagId == null) {
                 return null;
             }
 
             MedicineTag tag = new MedicineTag();
-            tag.setMedicineId(dto.getExternalId());
+            tag.setMedicineId(dto.getMedicineId());
             tag.setTagId(tagId);
 
             return tag;

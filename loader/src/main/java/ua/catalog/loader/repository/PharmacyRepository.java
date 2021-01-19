@@ -33,13 +33,13 @@ public class PharmacyRepository extends AbstractRepository implements BatchInser
             ps.setString(4, item.getName());
             ps.setString(7, item.getAddress());
 
-            if(!item.getPhone().isEmpty()){
+            if(item.getPhone() != null && !item.getPhone().isEmpty()){
                 ps.setString(5, item.getPhone());
             }else{
                 ps.setNull(5, Types.INTEGER);
             }
 
-            if(!item.getSchedule().isEmpty()){
+            if(item.getSchedule() != null && !item.getSchedule().isEmpty()){
                 ps.setString(6, item.getSchedule());
             }else{
                 ps.setNull(6, Types.INTEGER);

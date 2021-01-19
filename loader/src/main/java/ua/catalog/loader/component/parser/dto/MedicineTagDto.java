@@ -12,7 +12,7 @@ public class MedicineTagDto {
     @CsvBindByName(column = "tag_vocabulary_id")
     private Integer tagVocabularyId;
 
-    @CsvBindByName(column = "external_id")
-    private Integer externalId;
+    @CsvBindByName(column = "external_tag_id")
+    private Integer externalTagId;
 
 }

@@ -1,16 +1,20 @@
+-- medicine
 select id,
        substring(CASE WHEN name_local = '' || name_local IS NULL THEN name ELSE name_local END, 1, 255) as name,
-       unique_number as code_ua,
-       morion_code as code_morion,
-       optima_code as code_optima,
-       badm_code as code_badm,
+       unique_number                                                                                    as code_ua,
+       morion_code                                                                                      as code_morion,
+       optima_code                                                                                      as code_optima,
+       badm_code                                                                                        as code_badm,
        description,
-       (select concat('https://static.doc.ua', '/', TRIM(BOTH '/' FROM web_url), '/' , file)  from vrachi.media where media.id = media_id and storage = 'S3Storage') as image
+       (select concat('https://static.doc.ua', '/', TRIM(BOTH '/' FROM web_url), '/', file)
+        from vrachi.media
+        where media.id = media_id
+          and storage = 'S3Storage')                                                                    as image
 from medicine
 where (name_local != '' or name != '');
 
 
-select mp.medicine_id                                                                                        external_medicine_id,
+select mp.medicine_id                                                                                external_medicine_id,
        substring(CASE WHEN name_ua = '' || name_ua IS NULL THEN name_ru ELSE name_ua END, 1, 255) as name,
        mp.description,
        mp.integration_id,
@@ -24,10 +28,14 @@ where (mp.name_ua != '' or mp.name_ru != '')
 
 
 -- add price and quantity > 0 and not null
-select integration_id, medicine_id as external_medicine_id, affiliate_id as external_pharmacy_id,  price * 100 as price, quantity
+select integration_id,
+       medicine_id  as external_medicine_id,
+       affiliate_id as external_pharmacy_id,
+       price * 100  as price,
+       quantity
 from medicine_price;
 
-
+-- Pharmacy
 select pharmacy_id as integration_id,
        branch_id   as external_pharmacy_id,
        name,
@@ -61,13 +69,23 @@ select pharmacy_id as integration_id,
            WHEN city_id = 96 THEN 2288
            ELSE NULL
            END     as city_id
-from pharmacy_affiliate where pharmacy_id > 0;
+from pharmacy_affiliate
+where pharmacy_id > 0;
 
+
+-- Tags
 
 select model_id as external_id, value as name, 1 as tag_vocabulary_id
 from translation
 where model_class = 'PopularCategory'
   and field = 'name'
-  and model_id in ( select id from apteka.popular_category where popular = 1)
+  and model_id in (select id from apteka.popular_category where popular = 1)
+
+-- MedicineTags
+
+select p.medicine_id, p.popular_category_id as external_tag_id, 1 as tag_vocabulary_id
+from popular_category_medicine p
+         inner join popular_category pc on p.popular_category_id = pc.id
+where pc.popular = 1;
 
 

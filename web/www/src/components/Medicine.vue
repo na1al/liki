@@ -75,7 +75,7 @@
                        v-for="item in group.items" v-if="item.pharmacy.lat"
                        v-on:click="showInfoWindow(item.index)">
                     <img src="/empty.png" v-bind:src="'/logos/'+item.pharmacy.id.integrationId+'.jpg'"
-                         class="flex-shrink-0 rounded me-3" alt="..." width="30" height="30">
+                         class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
                     <div>
                       <h5 class="mt-0">{{ item.pharmacy.name }}</h5>
                       <span class="fw-light">{{ item.pharmacy.address }} <span
@@ -207,7 +207,7 @@ export default {
             }
 
             for (let i in res.data) {
-              this.markers[i] = {
+              this.markers[this.markers.length] = {
                 content: '<h5>' + res.data[i].pharmacy.name + '</h5><p>' + res.data[i].pharmacy.address + '</p><p>' + (res.data[i].pharmacy.phone ? res.data[i].pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(res.data[i].price) + '</div>',
                 position: {
                   lat: res.data[i].pharmacy.lat,

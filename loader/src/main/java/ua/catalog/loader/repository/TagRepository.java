@@ -17,9 +17,13 @@ public class TagRepository extends AbstractRepository implements BatchInsert<Tag
 
         PreparedStatement ps = connection.prepareStatement("SELECT id, tag_vocabulary_id, external_id FROM tag");
         ResultSet rs = ps.executeQuery();
-
         while (rs.next()) {
-            index.put(rs.getInt("tag_vocabulary_id"),Map.of(rs.getInt("external_id"), rs.getInt("id")));
+            if (!index.containsKey(rs.getInt("tag_vocabulary_id"))) {
+                index.put(rs.getInt("tag_vocabulary_id"), new HashMap<>());
+            }
+            index
+                    .get(rs.getInt("tag_vocabulary_id"))
+                    .put(rs.getInt("external_id"), rs.getInt("id"));
         }
 
         return index;

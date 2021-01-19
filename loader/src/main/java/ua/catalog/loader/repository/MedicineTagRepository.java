@@ -14,15 +14,13 @@ public class MedicineTagRepository extends AbstractRepository implements BatchIn
             return;
         }
 
-        PreparedStatement ps = connection.prepareStatement("INSERT INTO medicine_tags  (tag_vocabulary_id, external_id) VALUES  (?, ?, ?, ?) ON CONFLICT ON CONSTRAINT idx_tag_external_id DO UPDATE " +
-                "  SET name = excluded.name, " +
-                "      alias = excluded.alias;");
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO medicine_tag  (medicine_id, tag_id) VALUES  (?, ?) ON CONFLICT ON CONSTRAINT medicine_tag_pkey DO NOTHING ");
 
         connection.setAutoCommit(false);
 
         for (MedicineTag item : items) {
-            ps.setInt(3, item.getTagVocabularyId());
-            ps.setInt(4, item.getExternalId());
+            ps.setInt(1, item.getMedicineId());
+            ps.setInt(2, item.getTagId());
             ps.addBatch();
         }
 

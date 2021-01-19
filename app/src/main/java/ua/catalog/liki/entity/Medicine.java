@@ -1,11 +1,9 @@
 package ua.catalog.liki.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.hibernate.annotations.*;
 import ua.catalog.liki.views.MedicineView;
 
@@ -60,6 +58,7 @@ public class Medicine extends BaseEntity {
     @Column(columnDefinition = "int NOT NULL DEFAULT 0")
     private int priority;
 
+    @JsonView({MedicineView.View.class})
     @ManyToMany
     private Set<Tag> tag = new HashSet<>();
 

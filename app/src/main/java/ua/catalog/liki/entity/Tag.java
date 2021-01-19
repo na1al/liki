@@ -1,16 +1,18 @@
 package ua.catalog.liki.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+@JsonIgnoreProperties(value = {"vocabulary", "createdAt", "updatedAt", "externalId"})
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @Table(indexes = {
         @Index(name = "idx_tag_alias", columnList = "alias", unique = true),
-        @Index(name = "idx_tag_external_id", columnList = "tag_vocabulary_id,externalId", unique = true),
+        @Index(name = "idx_tag_external_id", columnList = "tag_vocabulary_id, externalId", unique = true),
 })
 public class Tag extends BaseEntity {
 
