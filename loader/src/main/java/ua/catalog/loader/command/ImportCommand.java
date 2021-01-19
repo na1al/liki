@@ -119,7 +119,7 @@ public class ImportCommand implements Runnable {
         protected TagMapper mapper;
         private BatchInsert<MedicineTag> repository;
         private TagRepository tagRepository;
-        private Map<Integer, Map<Integer, Integer>> tagCascadeIndex = null;
+        private Map<TagVocabulary.Type, Map<Integer, Integer>> tagCascadeIndex = null;
 
         public MedicineTagsCommand(Source source) throws FileNotFoundException {
             super(new Parser<>(MedicineTagDto.class, source.getUrl()));
@@ -135,7 +135,7 @@ public class ImportCommand implements Runnable {
                 tagCascadeIndex = tagRepository.getTagCascadeIndex();
             }
 
-            Map<Integer, Integer> map = tagCascadeIndex.get(dto.getTagVocabularyId());
+            Map<Integer, Integer> map = tagCascadeIndex.get(TagVocabulary.Type.valueOf(dto.getType()));
 
             if (map == null) {
                 return null;

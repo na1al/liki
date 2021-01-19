@@ -1,6 +1,7 @@
 package ua.catalog.loader.repository;
 
 import ua.catalog.loader.entity.Tag;
+import ua.catalog.loader.entity.TagVocabulary;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,18 +12,20 @@ import java.util.Map;
 
 public class TagRepository extends AbstractRepository implements BatchInsert<Tag> {
 
-    public Map<Integer, Map<Integer, Integer>> getTagCascadeIndex() throws SQLException {
+    public Map<TagVocabulary.Type, Map<Integer, Integer>> getTagCascadeIndex() throws SQLException {
 
-        Map<Integer, Map<Integer, Integer>> index = new HashMap<>();
+        Map<TagVocabulary.Type, Map<Integer, Integer>> index = new HashMap<>();
 
-        PreparedStatement ps = connection.prepareStatement("SELECT id, tag_vocabulary_id, external_id FROM tag");
+        PreparedStatement ps = connection.prepareStatement("SELECT id, type,  external_id FROM tag " +
+                "INNER JOIN tag_vocabulary v ON tag_vocabulary_id = v.id");
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            if (!index.containsKey(rs.getInt("tag_vocabulary_id"))) {
-                index.put(rs.getInt("tag_vocabulary_id"), new HashMap<>());
+
+            if (!index.containsKey(rs.getString("type"))) {
+                index.put(TagVocabulary.Type.valueOf(rs.getString("type")), new HashMap<>());
             }
             index
-                    .get(rs.getInt("tag_vocabulary_id"))
+                    .get(rs.getString("type"))
                     .put(rs.getInt("external_id"), rs.getInt("id"));
         }
 

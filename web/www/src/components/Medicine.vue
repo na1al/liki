@@ -42,8 +42,12 @@
             <h4 class="alert-heading">{{ medicine.name }}</h4>
             <p>Данний препарат незнайдений в жодній із аптек.</p>
             <hr>
-            <p class="mb-0">Ви можете перейти до категорії `Назва категоріі` для пошуку анологів чи скористатись
-              пошуком.</p>
+            <p class="mb-0" v-if="category">
+              Ви можете перейти до категорії <a v-bind:href="'/#/catalog/'+category.alias">{{category.name}}</a>  для пошуку анологів чи скористатись пошуком.
+            </p>
+            <p class="mb-0" v-else>
+              Ви можете скористатись пошуком. Можливо ми підберем для вас щось краще.
+            </p>
           </div>
 
 
@@ -123,12 +127,17 @@ import Addresses from './map/AddressMap'
 import Breadcrumb from './Breadcrumb'
 
 
+const TAG = {
+  TYPE_CATEGORY: "CATEGORY"
+}
+
 export default {
   data() {
     return {
       loading: true,
       alias: null,
       medicine: null,
+      category: null,
       markers: [],
       showMarkerId: null,
       prices: null,
@@ -145,7 +154,8 @@ export default {
   },
   methods: {
     breadcrumbs: function () {
-      return [
+
+      let breadcrumbs = [
         {
           title: "Головна",
           url: "/",
@@ -153,14 +163,21 @@ export default {
         {
           title: "Каталог",
           url: "/#/catalog",
-        },
-        {
-          title: "Назва категоріі",
-        },
-        {
-          title: this.medicine ? this.medicine.name: '',
         }
       ];
+
+      if (this.category) {
+        breadcrumbs[breadcrumbs.length] = {
+          title: this.category.name,
+          url: "/#/catalog/" + this.category.alias,
+        };
+      }
+
+      breadcrumbs[breadcrumbs.length] = {
+        title: this.medicine ? this.medicine.name : '',
+      };
+
+      return breadcrumbs;
     },
     showInfoWindow: function (index) {
       this.showMarkerId = parseInt(index);
@@ -172,51 +189,72 @@ export default {
           .then(res => res.json())
           .then(res => {
             this.medicine = res.data;
+            this.category = that._getCategoryFromMedicine(this.medicine);
             this.fetchMedicinePrices();
           });
     },
     fetchMedicinePrices: function () {
+      let that = this;
       fetch('/v1/price/medicine/' + this.medicine.id)
           .then(res => res.json())
           .then(res => {
             this.loading = false;
-            this.prices = new Map();
-
-            for (let i in res.data) {
-
-              let item = res.data[i];
-              let groupId = item.pharmacy.id.integrationId;
-
-              if (!this.prices.has(groupId)) {
-                this.prices.set(groupId, {
-                  pharmacy: item.pharmacy,
-                  minPrice: 0,
-                  items: []
-                })
-              }
-
-              let group = this.prices.get(groupId);
-              item.index = i;
-              group.items[group.items.length] = item;
-
-              if (!group.minPrice || group.minPrice < item.price) {
-                group.pharmacy = item.pharmacy;
-                group.minPrice = item.price;
-              }
-
-            }
-
-            for (let i in res.data) {
-              this.markers[this.markers.length] = {
-                content: '<h5>' + res.data[i].pharmacy.name + '</h5><p>' + res.data[i].pharmacy.address + '</p><p>' + (res.data[i].pharmacy.phone ? res.data[i].pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(res.data[i].price) + '</div>',
-                position: {
-                  lat: res.data[i].pharmacy.lat,
-                  lng: res.data[i].pharmacy.lng,
-                }
-              };
-            }
+            this.prices = that._getPrices(res.data)
+            this.markers = that._getMarkers(res.data);
             this.addressComponentVersion++;
           });
+    },
+    _getPrices: function (data) {
+      let prices = new Map();
+
+      for (let i in data) {
+
+        let item = data[i];
+        let groupId = item.pharmacy.id.integrationId;
+
+        if (!prices.has(groupId)) {
+          prices.set(groupId, {
+            pharmacy: item.pharmacy,
+            minPrice: 0,
+            items: []
+          })
+        }
+
+        let group = prices.get(groupId);
+        item.index = i;
+        group.items[group.items.length] = item;
+
+        if (!group.minPrice || group.minPrice < item.price) {
+          group.pharmacy = item.pharmacy;
+          group.minPrice = item.price;
+        }
+
+      }
+      return prices;
+    },
+    _getMarkers: function (data) {
+      let markers = [];
+      for (let i in data) {
+        markers[i] = {
+          content: '<h5>' + data[i].pharmacy.name + '</h5><p>' + data[i].pharmacy.address + '</p><p>' + (data[i].pharmacy.phone ? data[i].pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(data[i].price) + '</div>',
+          position: {
+            lat: data[i].pharmacy.lat,
+            lng: data[i].pharmacy.lng,
+          }
+        };
+      }
+      return markers;
+    },
+    _getCategoryFromMedicine: function (medicine) {
+      for (let i in medicine.tag) {
+        if (!medicine.tag.hasOwnProperty(i)) {
+          continue;
+        }
+        if (medicine.tag[i].vocabulary.type === TAG.TYPE_CATEGORY) {
+          return medicine.tag[i];
+        }
+      }
+      return null;
     }
   }
 }

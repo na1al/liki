@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
-@JsonIgnoreProperties(value = {"vocabulary", "createdAt", "updatedAt", "externalId"})
+@JsonIgnoreProperties(value = {"createdAt", "updatedAt", "externalId"})
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
@@ -26,7 +26,7 @@ public class Tag extends BaseEntity {
     @Basic
     private String alias;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tag_vocabulary_id")
     private TagVocabulary vocabulary;
 

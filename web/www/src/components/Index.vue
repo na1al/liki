@@ -63,7 +63,7 @@ export default {
       this.$router.push({name: 'medicine', params: {alias: alias}})
     },
     fetchCatalog: function () {
-      fetch('/v1/medicine/top')
+      fetch('/v1/widget/top')
           .then(res => res.json())
           .then(res => {
             this.medicines = res.data;

@@ -27,9 +27,11 @@
                   v-for="item in medicine.registrations">{{ item.code }}</span></p>
               <p class="fw-light fst-italic" style="font-size: 14px;" v-else>р/н: -</p>
 
-              <span class="fw-bold fst-italic" v-for="price in medicine.prices">від {{
-                  price.price | formatPrice
-                }}</span>
+              <div class="fw-bold fst-italic" v-if="medicine.prices.length">
+                від {{ medicine.prices[0].price | formatPrice }}
+              </div>
+              <span class="fw-light fst-italic bg-light p-1" v-else>Ціна відсутня</span>
+
 
             </div>
           </div>
@@ -67,6 +69,7 @@ export default {
   data() {
     return {
       loading: true,
+      category: null,
       medicines: [],
       currentPage: 1,
       totalPages: null
@@ -97,7 +100,14 @@ export default {
     },
     fetchMedicine: function () {
 
-      let url = new URL(window.location.protocol + "//" + window.location.host + "/v1/medicine");
+      let link = window.location.protocol + "//" + window.location.host + "/v1/catalog";
+
+      if(this.$route.params.alias){
+        link += '/category/'+this.$route.params.alias;
+      }
+
+      let url = new URL(link);
+
       Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]))
 
       fetch(url)

@@ -15,7 +15,7 @@ public class TagDto {
     @CsvBindByName(column = "alias")
     private String alias;
 
-    @CsvBindByName(column = "tag_vocabulary_id")
+    @CsvBindByName(column = "type")
     private Integer tagVocabularyId;
 
     @CsvBindByName(column = "external_id")

@@ -18,6 +18,10 @@ export default new Router({
       component: Catalog
     },
     {
+      path: '/catalog/:alias',
+      component: Catalog
+    },
+    {
       path: '/m/:alias',
       name: 'medicine',
       component: Medicine

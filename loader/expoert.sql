@@ -83,7 +83,7 @@ where model_class = 'PopularCategory'
 
 -- MedicineTags
 
-select p.medicine_id, p.popular_category_id as external_tag_id, 1 as tag_vocabulary_id
+select p.medicine_id, p.popular_category_id as external_tag_id, 'CATEGORY' as type
 from popular_category_medicine p
          inner join popular_category pc on p.popular_category_id = pc.id
 where pc.popular = 1;
