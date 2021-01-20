@@ -19,6 +19,7 @@ public class TagVocabulary extends BaseEntity {
     @Basic(optional = false)
     private String name;
 
+    @Basic(optional = false)
     @Column(columnDefinition = "varchar(20)")
     @Enumerated(EnumType.STRING)
     private Type type;

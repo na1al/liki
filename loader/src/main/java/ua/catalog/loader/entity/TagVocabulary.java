@@ -12,7 +12,7 @@ public class TagVocabulary {
     private String type;
 
     public enum Type {
-        CATEGORY
+        CATEGORY, MANUFACTURER, FORM, RECIPE, WHOM
     }
 
 }

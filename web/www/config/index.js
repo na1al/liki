@@ -12,8 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '**': {
-            //target: 'http://172.17.0.1:8081',
-            target: 'http://host.docker.internal:8081',
+            target: 'http://172.17.0.1:8081',
+            //target: 'http://host.docker.internal:8081',
             changeOrigin: false
         },
     },

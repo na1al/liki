@@ -1,11 +1,11 @@
 package ua.catalog.liki.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
+import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -35,6 +35,12 @@ public class WebConfig implements WebMvcConfigurer {
                 registry.addMapping("/live").allowedOrigins("*");
             }
         };
+    }
+
+    @Bean
+    public HttpTraceRepository htttpTraceRepository()
+    {
+        return new InMemoryHttpTraceRepository();
     }
 
 }

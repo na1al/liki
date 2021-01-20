@@ -95,22 +95,28 @@ public class ImportCommand implements Runnable {
     private final static class TagCommand extends AbstractImporter<TagDto, Tag> {
 
         protected TagMapper mapper;
-        private BatchInsert<Tag> repository;
+        private BatchInsert<Tag> tagRepository;
+        private TagVocabularyRepository tagVocabularyRepository;
+        private Map<TagVocabulary.Type, Integer> tagVocabularyIndex = null;
 
         public TagCommand(Source source) throws FileNotFoundException {
             super(new Parser<>(TagDto.class, source.getUrl()));
             mapper = new TagMapperImpl();
-            repository = new TagRepository();
+            tagRepository = new TagRepository();
+            tagVocabularyRepository = new TagVocabularyRepository();
         }
 
         @Override
-        public Tag cast(TagDto dto) {
-            return mapper.toEntity(dto);
+        public Tag cast(TagDto dto) throws SQLException {
+            if (tagVocabularyIndex == null) {
+                tagVocabularyIndex = tagVocabularyRepository.getTagVocabularyIndex();
+            }
+            return mapper.toEntity(dto, tagVocabularyIndex);
         }
 
         @Override
         public void batchInsert(List<Tag> entities) throws SQLException {
-            repository.batchInsert(entities);
+            tagRepository.batchInsert(entities);
         }
     }
 
@@ -135,21 +141,11 @@ public class ImportCommand implements Runnable {
                 tagCascadeIndex = tagRepository.getTagCascadeIndex();
             }
 
-            Map<Integer, Integer> map = tagCascadeIndex.get(TagVocabulary.Type.valueOf(dto.getType()));
+            MedicineTag tag = mapper.toEntity(dto, tagCascadeIndex);
 
-            if (map == null) {
+            if(tag.getTagId() == null){
                 return null;
             }
-
-            Integer tagId = map.get(dto.getExternalTagId());
-
-            if (tagId == null) {
-                return null;
-            }
-
-            MedicineTag tag = new MedicineTag();
-            tag.setMedicineId(dto.getMedicineId());
-            tag.setTagId(tagId);
 
             return tag;
         }

@@ -12,20 +12,14 @@ public class TagDto {
     @CsvBindByName(column = "name")
     private String name;
 
-    @CsvBindByName(column = "alias")
-    private String alias;
-
     @CsvBindByName(column = "type")
-    private Integer tagVocabularyId;
+    private String type;
 
     @CsvBindByName(column = "external_id")
     private Integer externalId;
 
     public void setName(String name) {
         this.name = name.trim();
-    }
-    public void setAlias(String alias) {
-        this.alias = alias.trim();
     }
 
 }

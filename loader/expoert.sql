@@ -75,17 +75,71 @@ where pharmacy_id > 0;
 
 -- Tags
 
-select model_id as external_id, value as name, 1 as tag_vocabulary_id
+select p.medicine_id, p.popular_category_id as external_tag_id, 'CATEGORY' as type
+from popular_category_medicine p
+         inner join popular_category pc on p.popular_category_id = pc.id
+where pc.popular = 1
+
+UNION
+
+select m.medicine_id, fv.id as external_tag_id, 'MANUFACTURER' as type
+from medicine_filter_value m
+         inner join filter_value fv on m.filter_value_id = fv.id
+where filter_id = 4
+
+UNION
+
+select m.medicine_id, fv.id as external_tag_id, 'WHOM' as type
+from medicine_filter_value m
+         inner join filter_value fv on m.filter_value_id = fv.id
+where filter_id = 6
+
+UNION
+
+select m.medicine_id, fv.id as external_tag_id, 'FORM' as type
+from medicine_filter_value m
+         inner join filter_value fv on m.filter_value_id = fv.id
+where filter_id = 7
+
+UNION
+
+select m.medicine_id, fv.id as external_tag_id, 'RECIPE' as type
+from medicine_filter_value m
+         inner join filter_value fv on m.filter_value_id = fv.id
+where filter_id = 11;
+
+-- MedicineTag
+
+select model_id as external_id, value as name, 'CATEGORY' as type
 from translation
 where model_class = 'PopularCategory'
   and field = 'name'
   and model_id in (select id from apteka.popular_category where popular = 1)
 
--- MedicineTags
+UNION
 
-select p.medicine_id, p.popular_category_id as external_tag_id, 'CATEGORY' as type
-from popular_category_medicine p
-         inner join popular_category pc on p.popular_category_id = pc.id
-where pc.popular = 1;
+select id as external_id, name, 'MANUFACTURER' as type
+from apteka.filter_value
+where filter_id = 4
+
+UNION
+
+select id as external_id, name, 'WHOM' as type
+from apteka.filter_value
+where filter_id = 6
+
+UNION
+
+select id as external_id, name, 'FORM' as type
+from apteka.filter_value
+where filter_id = 7
+
+UNION
+
+select id as external_id, name, 'RECIPE' as type
+from apteka.filter_value
+where filter_id = 11;
+
+
 
 
