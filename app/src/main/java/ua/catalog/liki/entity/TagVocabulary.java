@@ -25,7 +25,7 @@ public class TagVocabulary extends BaseEntity {
     private Type type;
 
     public enum Type {
-        CATEGORY
+        CATEGORY, MANUFACTURER, FORM, RECIPE, WHOM
     }
 
 }

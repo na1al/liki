@@ -3,10 +3,12 @@ package ua.catalog.liki.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.catalog.liki.dto.CatalogSearchFilter;
 import ua.catalog.liki.entity.Medicine;
 import ua.catalog.liki.entity.Tag;
 import ua.catalog.liki.repository.MedicineRepository;
 import ua.catalog.liki.repository.MedicineViewsRepository;
+import ua.catalog.liki.repository.specification.CatalogSearchSpecification;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,12 +30,8 @@ public class CatalogService {
         return medicineRepository.findTop10ByOrderByPriorityDescMediaDesc();
     }
 
-    public Page<Medicine> catalogSearch(Pageable pageable) {
-        return medicineRepository.findAllCatalog(pageable);
-    }
-
-    public Page<Medicine> catalogSearch(Tag tag, Pageable pageable) {
-        return medicineRepository.findAllCatalog(tag.getId(), pageable);
+    public Page<Medicine> catalogSearch(CatalogSearchFilter filter, Pageable pageable) {
+        return medicineRepository.findAll(new CatalogSearchSpecification(), pageable);
     }
 
     public Optional<Medicine> viewByAlias(String alias) {

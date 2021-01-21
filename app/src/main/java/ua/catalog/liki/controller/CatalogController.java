@@ -34,18 +34,23 @@ public class CatalogController {
 
     @JsonView({MedicineView.List.class})
     @GetMapping("/catalog")
-    public Response<Page<Medicine>> list(@RequestParam(value = "page", defaultValue = "0") Integer page, Response<Page<Medicine>> model) {
+    public Response<Page<Medicine>> list(@RequestParam Tag[] key,
+                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                         Response<Page<Medicine>> model) {
         Pageable pageable = PageRequest.of(page, CATALOG_PER_PAGE);
-        model.data = catalogService.catalogSearch(pageable);
+      //  model.data = catalogService.catalogSearch(pageable);
         return model;
     }
 
     @JsonView({MedicineView.List.class})
     @GetMapping("/catalog/category/{alias}")
-    public Response<Page<Medicine>> list(@PathVariable("alias") String alias, @RequestParam(value = "page", defaultValue = "0") Integer page, Response<Page<Medicine>> model) {
+    public Response<Page<Medicine>> list(@PathVariable("alias") String alias,
+                                         @RequestParam(required = false) String key,
+                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                         Response<Page<Medicine>> model) {
         Pageable pageable = PageRequest.of(page, CATALOG_PER_PAGE);
         Tag tag = tagService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        model.data = catalogService.catalogSearch(tag,pageable);
+       // model.data = catalogService.catalogSearch(tag, pageable);
         return model;
     }
 

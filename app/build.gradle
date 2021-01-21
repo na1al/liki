@@ -42,7 +42,7 @@ dependencies {
 
 	compile group: 'org.flywaydb', name: 'flyway-core', version: '7.3.2'
 
-	implementation 'de.codecentric:spring-boot-admin-starter-client'
+//	implementation 'de.codecentric:spring-boot-admin-starter-client'
 
 }
 
