@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.catalog.liki.dto.Response;
 import ua.catalog.liki.entity.Medicine;
 import ua.catalog.liki.service.CatalogService;
-import ua.catalog.liki.views.MedicineView;
+import ua.catalog.liki.view.MedicineView;
 
 import java.util.List;
 

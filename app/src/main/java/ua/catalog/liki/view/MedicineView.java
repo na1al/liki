@@ -1,4 +1,4 @@
-package ua.catalog.liki.views;
+package ua.catalog.liki.view;
 
 public class MedicineView extends View {
 

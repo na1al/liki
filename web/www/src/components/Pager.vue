@@ -20,8 +20,6 @@
         <span aria-hidden="true" class="page-link">&raquo;</span>
       </li>
     </ul>
-    {{ totalPages }}
-    {{ currentPage }}
   </nav>
 </template>
 

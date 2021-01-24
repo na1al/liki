@@ -1,57 +1,35 @@
 <template>
 
-  <div>
+
+  <div class="container-fluid">
+    <Search/>
+    <Breadcrumb :items="breadcrumbs()"/>
 
 
-    <div class="view">
-
-      <div class="container">
-        <Search/>
-        <Breadcrumb :items="breadcrumbs()"/>
-
-        <div class="medicine border rounded mb-2 p-2" style="cursor: pointer" v-for="medicine in medicines"
-             v-on:click="view(medicine.alias)">
+    <div class="content">
 
 
-          <div class="d-flex position-relative">
+      <div class="row">
+        <div class="col-xxl-2">
+          One of three columns
+        </div>
+        <div class="col-xxl-10">
 
-            <div style="width: 160px;" class="overflow-hidden me-3">
-              <img v-if="medicine.media" v-bind:src="'/images/204x177/'+medicine.media.name" class=" me-3"
-                   style="max-height: 100px;">
-              <img v-else src="/empty.png" class="me-3" style="max-height: 100px;">
-            </div>
-
-            <div>
-              <h4>{{ medicine.name }}</h4>
-              <p class="fw-light fst-italic" style="font-size: 14px;" v-if="medicine.registrations.length">р/н: <span
-                  v-for="item in medicine.registrations">{{ item.code }}</span></p>
-              <p class="fw-light fst-italic" style="font-size: 14px;" v-else>р/н: -</p>
-
-              <div class="fw-bold fst-italic" v-if="medicine.prices.length">
-                від {{ medicine.prices[0].price | formatPrice }}
-              </div>
-              <span class="fw-light fst-italic bg-light p-1" v-else>Ціна відсутня</span>
-
-
+          <div class="row  row-cols-xl-5 row-cols-lg-4  row-cols-md-3 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
+            <div class="col mb-3" style="cursor: pointer" v-for="medicine in medicines">
+              <MedicineCard :medicine="medicine"/>
             </div>
           </div>
 
-
-        </div> <!-- class medicine -->
-
-        <Pager v-if="totalPages"
-               :current-page="currentPage"
-               :totalPages="totalPages"
-        />
-
+        </div>
       </div>
 
     </div>
 
-
-    <div class="map-container">
-      <Addresses/>
-    </div>
+    <Pager v-if="totalPages"
+           :current-page="currentPage"
+           :totalPages="totalPages"
+    />
 
   </div>
 
@@ -64,6 +42,7 @@ import Search from './header/Search'
 import Pager from './Pager'
 import Addresses from './map/AddressMap'
 import Breadcrumb from './Breadcrumb'
+import MedicineCard from "./MedicineCard";
 
 export default {
   data() {
@@ -75,7 +54,7 @@ export default {
       totalPages: null
     }
   },
-  components: {Search, Addresses, Pager, Breadcrumb},
+  components: {Search, Addresses, Pager, Breadcrumb, MedicineCard},
   created() {
     this.loading = true;
     this.fetchMedicine();
@@ -95,15 +74,12 @@ export default {
         }
       ];
     },
-    view: function (alias) {
-      this.$router.push({name: 'medicine', params: {alias: alias}})
-    },
     fetchMedicine: function () {
 
       let link = window.location.protocol + "//" + window.location.host + "/v1/catalog";
 
-      if(this.$route.params.alias){
-        link += '/category/'+this.$route.params.alias;
+      if (this.$route.params.alias) {
+        link += '/category/' + this.$route.params.alias;
       }
 
       let url = new URL(link);
@@ -125,27 +101,7 @@ export default {
 
 
 <style scoped>
-.view {
-  width: 50%;
-  float: left;
-}
 
-.map-container {
-  height: 100%;
-  width: 50%;
-  float: right;
-  position: fixed;
-  right: 0px;
-}
-
-.accordion-button::after {
-  display: none;
-}
-
-.accordion-button:not(.collapsed) {
-  color: #000;
-  background-color: #fff;
-}
 
 </style>
 

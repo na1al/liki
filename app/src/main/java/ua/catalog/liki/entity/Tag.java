@@ -1,8 +1,10 @@
 package ua.catalog.liki.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ua.catalog.liki.view.TagView;
 
 import javax.persistence.*;
 
@@ -12,7 +14,7 @@ import javax.persistence.*;
 @Data
 @Table(indexes = {
         @Index(name = "idx_tag_alias", columnList = "alias", unique = true),
-        @Index(name = "idx_tag_external_id", columnList = "tag_vocabulary_id, externalId", unique = true),
+        @Index(name = "idx_tag_external_id", columnList = "tagVocabularyId, externalId", unique = true),
 })
 public class Tag extends BaseEntity {
 
@@ -26,8 +28,12 @@ public class Tag extends BaseEntity {
     @Basic
     private String alias;
 
+    @Basic
+    private int tagVocabularyId;
+
+    @JsonView({TagView.View.class})
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tag_vocabulary_id")
+    @JoinColumn(name = "tagVocabularyId", insertable = false, updatable = false)
     private TagVocabulary vocabulary;
 
     @Basic

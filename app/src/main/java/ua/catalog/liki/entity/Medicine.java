@@ -1,20 +1,24 @@
 package ua.catalog.liki.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.*;
-import ua.catalog.liki.views.MedicineView;
+import ua.catalog.liki.view.MedicineView;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@JsonIgnoreProperties(value = {"priority","createdAt", "updatedAt"})
+@JsonIgnoreProperties(value = {"medicineTag", "priority", "createdAt", "updatedAt"})
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
@@ -58,8 +62,31 @@ public class Medicine extends BaseEntity {
     @Column(columnDefinition = "int NOT NULL DEFAULT 0")
     private int priority;
 
-    @JsonView({MedicineView.View.class})
-    @ManyToMany
-    private Set<Tag> tag = new HashSet<>();
+//    @JsonView({MedicineView.View.class})
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    private Set<Tag> tag = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<MedicineTag> medicineTag = new HashSet<>();
+//
+//    @OneToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            joinColumns = { @JoinColumn(name = "medicine_id") },
+//            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+//    private Set<Tag> tag = new HashSet<>();
+
+//    @OneToMany( fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinTable(
+//            joinColumns = { @JoinColumn(name = "medicine_id") },
+//            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+//    private Set<Tag> tag = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "medicineId"),
+            inverseJoinColumns = @JoinColumn(name = "tagId")
+    )
+    private List<Tag> tag = new ArrayList<>();
 
 }

@@ -1,8 +1,7 @@
 package ua.catalog.liki.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.web.bind.annotation.ResponseBody;
-import ua.catalog.liki.views.View;
+import ua.catalog.liki.view.View;
 
 public class Response<T> {
 
