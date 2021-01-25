@@ -19,7 +19,9 @@ import ua.catalog.liki.util.propertyEditor.TagPropertyEditor;
 import ua.catalog.liki.view.MedicineView;
 import ua.catalog.liki.view.TagView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -32,7 +34,7 @@ public class CatalogController {
     private final TagService tagService;
     private final TagVocabularyService tagVocabularyService;
 
-    public CatalogController(CatalogService catalogService, TagService tagService,TagVocabularyService tagVocabularyService) {
+    public CatalogController(CatalogService catalogService, TagService tagService, TagVocabularyService tagVocabularyService) {
         this.catalogService = catalogService;
         this.tagService = tagService;
         this.tagVocabularyService = tagVocabularyService;
@@ -67,25 +69,21 @@ public class CatalogController {
 
     @JsonView({TagView.Filter.class})
     @GetMapping("/catalog/categories")
-    public Response<Set<Tag>> categories(Response<Set<Tag>> model){
+    public Response<Set<Tag>> categories(Response<Set<Tag>> model) {
         model.data = tagService.findAllByTagVocabularyId(CATEGORY_VOCABULARY_ID);
         return model;
     }
 
     @JsonView({TagView.Filter.class})
-    @GetMapping("/catalog/vocabularies")
-    public Response<List<TagVocabulary>> vocabularies(Response<List<TagVocabulary>> model){
-        model.data = tagVocabularyService.findAll();
-        return model;
-    }
-
-    @JsonView({TagView.Filter.class})
     @GetMapping("/catalog/filter/{alias}")
-    public Response<List<Tag>> filter(@PathVariable("alias") String alias,
-                                      @ModelAttribute(value = "filter") CatalogSearchFilter filter,
-                                      Response<List<Tag>> model){
+    public Response<Map<String, Object>> filter(@PathVariable("alias") String alias,
+                                                @ModelAttribute(value = "filter") CatalogSearchFilter filter,
+                                                Response<Map<String, Object>> model) {
         Tag tag = tagService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        model.data = catalogService.filter(tag, filter);
+        model.data = new HashMap<>();
+        model.data.put("category", tag);
+        model.data.put("vocabularies", tagVocabularyService.findAll());
+        model.data.put("filter", catalogService.filter(tag, filter));
         return model;
     }
 

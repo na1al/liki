@@ -11,8 +11,8 @@
 
       <div class="row">
         <div class="col-xxl-2">
-          <CategoryWidget v-if="categories" :categories="categories"/>
-          <FilterWidget v-if="filters" :filters="filters"/>
+          <CategoryWidget v-if="categories && !filter" :categories="categories"/>
+          <FilterWidget v-if="filter" :data="filter"/>
         </div>
         <div class="col-xxl-10">
 
@@ -52,7 +52,7 @@ export default {
       loading: true,
       category: null,
       categories: [],
-      filters: [],
+      filter: null,
       vocabularies: [],
       medicines: [],
       currentPage: 1,
@@ -69,27 +69,48 @@ export default {
   },
   methods: {
     breadcrumbs: function () {
-      return [
+      let breadcrumbs = [
         {
           title: "Головна",
           url: "/",
         },
         {
-          title: "Каталог"
+          title: "Каталог",
+          url: "/#/catalog",
         }
       ];
+
+      if (this.category) {
+        breadcrumbs[breadcrumbs.length] = {
+          title: this.category.name,
+          url: "/#/catalog/" + this.category.alias,
+        };
+      }
+      return breadcrumbs;
     },
     fetchMedicine: function () {
 
-      let link = "/v1/catalog";
-
-      if (this.$route.params.alias) {
-        link += '/category/' + this.$route.params.alias;
-      }
-
+      let link = this.$route.params.alias ? "/v1/catalog/category/" + this.$route.params.alias : "/v1/catalog";
       let url = new URL(window.location.protocol + "//" + window.location.host + link);
+      this.filter = this.$route.params.alias ? this.filter : null;
 
       Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]))
+
+      if (this.$route.params.alias) {
+        fetch("/v1/catalog/filter/" + this.$route.params.alias)
+            .then(res => res.json())
+            .then(res => {
+              this.filter = res.data;
+            });
+      }
+
+      if (!this.categories.length) {
+        fetch("/v1/catalog/categories")
+            .then(res => res.json())
+            .then(res => {
+              this.categories = res.data;
+            });
+      }
 
       fetch(url.toString())
           .then(res => res.json())
@@ -99,25 +120,6 @@ export default {
             this.currentPage = res.data.number ? res.data.number : 0;
             window.scrollTo(0, 0);
           });
-
-      if (!this.$route.params.alias) {
-        fetch("/v1/catalog/categories")
-            .then(res => res.json())
-            .then(res => {
-              this.categories = res.data;
-            });
-      } else {
-        fetch("/v1/catalog/vocabularies")
-            .then(res => res.json())
-            .then(res => {
-              this.vocabularies = res.data;
-              fetch("/v1/catalog/filter/" + this.$route.params.alias)
-                  .then(res => res.json())
-                  .then(res => {
-                    this.filters = res.data;
-                  });
-            });
-      }
     }
   }
 }

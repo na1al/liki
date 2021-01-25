@@ -43,7 +43,8 @@
             <p>Данний препарат незнайдений в жодній із аптек.</p>
             <hr>
             <p class="mb-0" v-if="category">
-              Ви можете перейти до категорії <a v-bind:href="'/#/catalog/'+category.alias">{{category.name}}</a>  для пошуку анологів чи скористатись пошуком.
+              Ви можете перейти до категорії <a v-bind:href="'/#/catalog/'+category.alias">{{ category.name }}</a> для
+              пошуку анологів чи скористатись пошуком.
             </p>
             <p class="mb-0" v-else>
               Ви можете скористатись пошуком. Можливо ми підберем для вас щось краще.
@@ -128,7 +129,7 @@ import Breadcrumb from './widgets/BreadcrumbWidget'
 
 
 const TAG = {
-  TYPE_CATEGORY: "CATEGORY"
+  TYPE_CATEGORY: 1
 }
 
 export default {
@@ -206,10 +207,8 @@ export default {
     },
     _getPrices: function (data) {
       let prices = new Map();
+      data.forEach((item, i) => {
 
-      for (let i in data) {
-
-        let item = data[i];
         let groupId = item.pharmacy.id.integrationId;
 
         if (!prices.has(groupId)) {
@@ -229,32 +228,25 @@ export default {
           group.minPrice = item.price;
         }
 
-      }
+      });
+
       return prices;
     },
+
     _getMarkers: function (data) {
-      let markers = [];
-      for (let i in data) {
-        markers[i] = {
-          content: '<h5>' + data[i].pharmacy.name + '</h5><p>' + data[i].pharmacy.address + '</p><p>' + (data[i].pharmacy.phone ? data[i].pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(data[i].price) + '</div>',
+      return data.map(item => {
+        return {
+          content: '<h5>' + item.pharmacy.name + '</h5><p>' + item.pharmacy.address + '</p><p>' + (item.pharmacy.phone ? item.pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(item.price) + '</div>',
           position: {
-            lat: data[i].pharmacy.lat,
-            lng: data[i].pharmacy.lng,
+            lat: item.pharmacy.lat,
+            lng: item.pharmacy.lng,
           }
-        };
-      }
-      return markers;
+        }
+      });
     },
+
     _getCategoryFromMedicine: function (medicine) {
-      for (let i in medicine.tag) {
-        if (!medicine.tag.hasOwnProperty(i)) {
-          continue;
-        }
-        if (medicine.tag[i].vocabulary.type === TAG.TYPE_CATEGORY) {
-          return medicine.tag[i];
-        }
-      }
-      return null;
+      return medicine.tag.find(v => v.vocabulary.id === TAG.TYPE_CATEGORY);
     }
   }
 }
