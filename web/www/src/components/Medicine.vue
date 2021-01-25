@@ -124,7 +124,7 @@
 
 import Search from './header/Search'
 import Addresses from './map/AddressMap'
-import Breadcrumb from './Breadcrumb'
+import Breadcrumb from './widgets/BreadcrumbWidget'
 
 
 const TAG = {

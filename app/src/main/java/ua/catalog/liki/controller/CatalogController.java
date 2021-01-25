@@ -11,8 +11,10 @@ import ua.catalog.liki.dto.CatalogSearchFilter;
 import ua.catalog.liki.dto.Response;
 import ua.catalog.liki.entity.Medicine;
 import ua.catalog.liki.entity.Tag;
+import ua.catalog.liki.entity.TagVocabulary;
 import ua.catalog.liki.service.CatalogService;
 import ua.catalog.liki.service.TagService;
+import ua.catalog.liki.service.TagVocabularyService;
 import ua.catalog.liki.util.propertyEditor.TagPropertyEditor;
 import ua.catalog.liki.view.MedicineView;
 import ua.catalog.liki.view.TagView;
@@ -24,12 +26,16 @@ import java.util.Set;
 @RequestMapping("/v1")
 public class CatalogController {
 
+    public final static int CATEGORY_VOCABULARY_ID = 1;
+
     private final CatalogService catalogService;
     private final TagService tagService;
+    private final TagVocabularyService tagVocabularyService;
 
-    public CatalogController(CatalogService catalogService, TagService tagService) {
+    public CatalogController(CatalogService catalogService, TagService tagService,TagVocabularyService tagVocabularyService) {
         this.catalogService = catalogService;
         this.tagService = tagService;
+        this.tagVocabularyService = tagVocabularyService;
     }
 
     @InitBinder("filter")
@@ -60,13 +66,26 @@ public class CatalogController {
     }
 
     @JsonView({TagView.Filter.class})
+    @GetMapping("/catalog/categories")
+    public Response<Set<Tag>> categories(Response<Set<Tag>> model){
+        model.data = tagService.findAllByTagVocabularyId(CATEGORY_VOCABULARY_ID);
+        return model;
+    }
+
+    @JsonView({TagView.Filter.class})
+    @GetMapping("/catalog/vocabularies")
+    public Response<List<TagVocabulary>> vocabularies(Response<List<TagVocabulary>> model){
+        model.data = tagVocabularyService.findAll();
+        return model;
+    }
+
+    @JsonView({TagView.Filter.class})
     @GetMapping("/catalog/filter/{alias}")
     public Response<List<Tag>> filter(@PathVariable("alias") String alias,
                                       @ModelAttribute(value = "filter") CatalogSearchFilter filter,
                                       Response<List<Tag>> model){
         Tag tag = tagService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         model.data = catalogService.filter(tag, filter);
-
         return model;
     }
 

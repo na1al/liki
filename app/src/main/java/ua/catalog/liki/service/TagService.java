@@ -22,6 +22,10 @@ public class TagService {
         return tagRepository.findOneByAlias(alias);
     }
 
+    public Set<Tag> findAllByTagVocabularyId(int id) {
+        return tagRepository.findAllByTagVocabularyId(id);
+    }
+
     public Set<Tag> findAllById(int[] id){
         return tagRepository.findAllByIdIn(id);
     }

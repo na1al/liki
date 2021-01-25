@@ -23,8 +23,6 @@ public class CatalogFilterSpecification implements Specification<Tag> {
     @Override
     public Predicate toPredicate(Root<Tag> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 
-        root.fetch("vocabulary");
-
         Set<Predicate> predicates = new HashSet<>();
 
         Subquery<Tag> sq = query.subquery(Tag.class);

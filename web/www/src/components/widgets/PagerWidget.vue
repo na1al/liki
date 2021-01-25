@@ -1,5 +1,5 @@
 <template>
-  <nav aria-label="Page navigation ">
+  <div aria-label="Page navigation ">
     <ul class="pagination mt-5 mb-5">
       <li class="page-item" v-if="currentPage > 0">
         <a class="page-link" v-bind:href="'/#/catalog?page='+(currentPage-1)" aria-label="Previous">
@@ -20,7 +20,7 @@
         <span aria-hidden="true" class="page-link">&raquo;</span>
       </li>
     </ul>
-  </nav>
+  </div>
 </template>
 
 <script>
