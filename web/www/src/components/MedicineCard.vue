@@ -1,6 +1,6 @@
 <template>
 
-  <div class="card" style="cursor: pointer;" v-on:click="view(medicine.alias)">
+  <a class="card" style="cursor: pointer;"  v-bind:href="'/#/m/'+medicine.alias">
     <div class="card-body ">
       <div class="overflow-hidden text-center">
         <img v-if="medicine.media" v-bind:src="'/images/204x177/'+medicine.media.name" class="rounded" alt="..."
@@ -16,7 +16,7 @@
           v-for="price in medicine.prices">від {{ price.price | formatPrice }}</span></p>
       <p class="fw-light fst-italic card-text bg-light p-1" v-else>Ціна відсутня</p>
     </div>
-  </div>
+  </a>
 
 </template>
 
@@ -30,13 +30,13 @@ export default {
     }
   },
   methods:{
-    view: function (alias) {
-      this.$router.push({name: 'medicine', params: {alias: alias}})
-    },
   }
 }
 </script>
 
 <style scoped>
-
+a.card{
+  color: black;
+  text-decoration: none;
+}
 </style>

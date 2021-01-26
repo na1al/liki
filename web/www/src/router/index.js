@@ -15,10 +15,12 @@ export default new Router({
     },
     {
       path: '/catalog',
+      name: 'catalog',
       component: Catalog
     },
     {
       path: '/catalog/:alias',
+      name: 'category-catalog',
       component: Catalog
     },
     {

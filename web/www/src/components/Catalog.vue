@@ -10,13 +10,13 @@
 
 
       <div class="row">
-        <div class="col-xxl-2">
+        <div class="d-none d-md-block col-md-3 col-xxl-2">
           <CategoryWidget v-if="categories && !filter" :categories="categories"/>
           <FilterWidget v-if="filter" :data="filter"/>
         </div>
-        <div class="col-xxl-10">
+        <div class="col-md-9 col-xxl-10">
 
-          <div class="row  row-cols-xl-5 row-cols-lg-4  row-cols-md-3 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
+          <div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
             <div class="col mb-3" style="cursor: pointer" v-for="medicine in medicines">
               <MedicineCard :medicine="medicine"/>
             </div>
@@ -92,6 +92,7 @@ export default {
 
       let link = this.$route.params.alias ? "/v1/catalog/category/" + this.$route.params.alias : "/v1/catalog";
       let url = new URL(window.location.protocol + "//" + window.location.host + link);
+      this.category = this.$route.params.alias ? this.category : null;
       this.filter = this.$route.params.alias ? this.filter : null;
 
       Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]))
@@ -100,6 +101,7 @@ export default {
         fetch("/v1/catalog/filter/" + this.$route.params.alias)
             .then(res => res.json())
             .then(res => {
+              this.category = res.data.category;
               this.filter = res.data;
             });
       }
