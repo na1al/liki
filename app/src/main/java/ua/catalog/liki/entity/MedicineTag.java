@@ -1,6 +1,5 @@
 package ua.catalog.liki.entity;
 
-import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,23 +31,6 @@ public class MedicineTag implements Serializable {
     @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="medicineId", referencedColumnName = "medicineId")
     private List<MedicineTag> selfMedicineTag;
-//
-//    @Embeddable
-//    public static class MedicineTagId implements Serializable {
-//
-//        @Column(name = "medicine_id")
-//        private Long medicineId;
-//
-//        @Column(name = "tag_id")
-//        private Long tagId;
-//
-//        protected MedicineTagId() {}
-//
-//        public MedicineTagId (Long postId, Long tagId) {
-//            this.medicineId = postId;
-//            this.tagId = tagId;
-//        }
-//    }
 
 }
 

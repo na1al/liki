@@ -1,12 +1,8 @@
 package ua.catalog.liki.util.propertyEditor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import ua.catalog.liki.entity.Tag;
 import ua.catalog.liki.service.TagService;
-
 import java.beans.PropertyEditorSupport;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Set;
 import java.util.stream.Stream;
 

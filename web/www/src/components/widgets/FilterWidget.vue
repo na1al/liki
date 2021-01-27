@@ -1,64 +1,105 @@
 <template>
+  <div v-if="filters">
+    <div v-for="group in filtersGroups">
 
-  <div v-if="data">
+      <div v-if="group.shown">
 
-    <div v-for="(items, index) in getFilters()">
-      <label><strong>{{ getVocabularyName(index) }}</strong></label>
+        <label><strong>{{ group.name }}</strong></label>
+        <div class="form-check" v-for="item in group.items">
+          <input class="form-check-input" type="checkbox" v-bind:value="item.id"
+                 v-bind:id="'filter-item-checkbox'+item.id" v-model="checked">
+          <label class="form-check-label" v-bind:for="'filter-item-checkbox'+item.id">
+            {{ item.name }}({{ group.active ? '+' + item.count : item.count }})
+          </label>
+        </div>
 
-      <div class="form-check" v-for="item in items">
-        <input class="form-check-input" type="checkbox" v-bind:value="item.id"
-               v-bind:id="'filter-item-checkbox'+item.id" v-model="activeFilterId">
-        <label class="form-check-label" v-bind:for="'filter-item-checkbox'+item.id">
-          {{ item.name }}
-        </label>
+
       </div>
 
     </div>
-
-
   </div>
-
-
 </template>
 
 <script>
-const TAG = {
-  TYPE_CATEGORY: 1
+
+class FilterGroup {
+
+  constructor(name, items) {
+    this.active = false;
+    this.shown = !!items.length
+    this.name = name;
+    this.items = items;
+    this._ids = items.map(v => v.id);
+  }
+
+  setState(ids) {
+    for (let id of ids) {
+      if (this._ids.includes(id)) {
+        this.active = true;
+        return;
+      }
+    }
+    this.active = false;
+  }
+
 }
+
 export default {
-  name: "Filer",
+  name: "FilterWidget",
   props: {
-    data: Object
+    filters: Array,
   },
   data() {
     return {
-      activeFilterId: []
+      checked: null,
+      filtersGroups: [],
     };
   },
+  created() {
+    this.init();
+  },
   watch: {
-    'activeFilterId': 'actionFilterChange'
+    'checked': 'actionFilterChange'
   },
   methods: {
-    actionFilterChange: function () {
-      let request = {name: 'category-catalog'};
+    init: function () {
+      this.fetchInputParams();
+      this.fetchVocabularies();
+    },
+    fetchInputParams: function () {
+      this.checked = this._keys();
+    },
+    actionFilterChange: function (n, o) {
 
-      if (this.activeFilterId.length) {
-        request.query = {key: this.activeFilterId.join('-')};
-      }
+      if (o === null) return;
+
+      this.filtersGroups.forEach(g => g.setState(n));
+
+      let request = {name: 'category-catalog'};
+      if (this.checked.length) request.query = {key: this.checked.join('-')};
 
       this.$router.push(request);
     },
-    getFilters: function () {
-      return this.data.filter
-          .filter(filter => filter.tagVocabularyId !== TAG.TYPE_CATEGORY)
+    fetchVocabularies: function () {
+      fetch("/v1/vocabulary")
+          .then(res => res.json())
+          .then(res => {
+            let grouped = this._group(this.filters, 'tagVocabularyId');
+            this.filtersGroups = res.data.map(v => new FilterGroup(v.name, grouped[v.id] ? grouped[v.id] : []));
+            this.filtersGroups.forEach(g => g.setState(this._keys()));
+          });
+    },
+    _keys: function () {
+      return this.$route.query.key ? this.$route.query.key.split('-').map(v => parseInt(v)) : [];
+    },
+    _group: function (data, name, exclude = []) {
+      return data
+          .filter(v => !exclude.includes(v[name]))
           .reduce(function (r, o) {
-            (r[o.tagVocabularyId] = r[o.tagVocabularyId] || []).push(o);
+            (r[o[name]] = r[o[name]] || []).push(o);
             return r;
           }, {})
-    },
-    getVocabularyName: function (id) {
-      return this.data.vocabularies.find(v => v.id === parseInt(id)).name;
-    },
+    }
   }
 }
 </script>

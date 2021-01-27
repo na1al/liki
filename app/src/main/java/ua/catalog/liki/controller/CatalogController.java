@@ -11,16 +11,13 @@ import ua.catalog.liki.dto.CatalogSearchFilter;
 import ua.catalog.liki.dto.Response;
 import ua.catalog.liki.entity.Medicine;
 import ua.catalog.liki.entity.Tag;
-import ua.catalog.liki.entity.TagVocabulary;
 import ua.catalog.liki.service.CatalogService;
 import ua.catalog.liki.service.TagService;
-import ua.catalog.liki.service.TagVocabularyService;
 import ua.catalog.liki.util.propertyEditor.TagPropertyEditor;
 import ua.catalog.liki.view.MedicineView;
 import ua.catalog.liki.view.TagView;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,12 +29,10 @@ public class CatalogController {
 
     private final CatalogService catalogService;
     private final TagService tagService;
-    private final TagVocabularyService tagVocabularyService;
 
-    public CatalogController(CatalogService catalogService, TagService tagService, TagVocabularyService tagVocabularyService) {
+    public CatalogController(CatalogService catalogService, TagService tagService) {
         this.catalogService = catalogService;
         this.tagService = tagService;
-        this.tagVocabularyService = tagVocabularyService;
     }
 
     @InitBinder("filter")
@@ -80,10 +75,10 @@ public class CatalogController {
                                                 @ModelAttribute(value = "filter") CatalogSearchFilter filter,
                                                 Response<Map<String, Object>> model) {
         Tag tag = tagService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
         model.data = new HashMap<>();
         model.data.put("category", tag);
-        model.data.put("vocabularies", tagVocabularyService.findAll());
-        model.data.put("filter", catalogService.filter(tag, filter));
+        model.data.put("filters", catalogService.filter(tag, filter));
         return model;
     }
 

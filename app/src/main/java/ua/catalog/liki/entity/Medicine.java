@@ -62,26 +62,11 @@ public class Medicine extends BaseEntity {
     @Column(columnDefinition = "int NOT NULL DEFAULT 0")
     private int priority;
 
-//    @JsonView({MedicineView.View.class})
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    private Set<Tag> tag = new HashSet<>();
-
     @JsonIgnore
     @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<MedicineTag> medicineTag = new HashSet<>();
-//
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            joinColumns = { @JoinColumn(name = "medicine_id") },
-//            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
-//    private Set<Tag> tag = new HashSet<>();
 
-//    @OneToMany( fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JoinTable(
-//            joinColumns = { @JoinColumn(name = "medicine_id") },
-//            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
-//    private Set<Tag> tag = new HashSet<>();
-
+    @JsonView(MedicineView.View.class)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             joinColumns = @JoinColumn(name = "medicineId"),

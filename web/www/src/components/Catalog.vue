@@ -11,12 +11,15 @@
 
       <div class="row">
         <div class="d-none d-md-block col-md-3 col-xxl-2">
-          <CategoryWidget v-if="categories && !filter" :categories="categories"/>
-          <FilterWidget v-if="filter" :data="filter"/>
+          <CategoryWidget v-if="categories && !filters" :categories="categories"/>
+          <FilterWidget v-if="filters"
+                        :filters="filters"
+          />
         </div>
         <div class="col-md-9 col-xxl-10">
 
-          <div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-xs-1" v-if="medicines">
+          <div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-xs-1"
+               v-if="medicines">
             <div class="col mb-3" style="cursor: pointer" v-for="medicine in medicines">
               <MedicineCard :medicine="medicine"/>
             </div>
@@ -52,8 +55,7 @@ export default {
       loading: true,
       category: null,
       categories: [],
-      filter: null,
-      vocabularies: [],
+      filters: null,
       medicines: [],
       currentPage: 1,
       totalPages: null
@@ -62,12 +64,22 @@ export default {
   components: {Search, CategoryWidget, FilterWidget, Pager, Breadcrumb, MedicineCard},
   created() {
     this.loading = true;
-    this.fetchMedicine();
+    this.init();
   },
   watch: {
-    '$route': 'fetchMedicine'
+    '$route': ['fetchMedicine', 'fetchFilter', 'fetchCategories']
   },
   methods: {
+    init() {
+      this.fetchMedicine();
+      this.fetchCategories();
+      this.fetchFilter();
+    },
+    getUrl: function (link) {
+      let url = new URL(window.location.protocol + "//" + window.location.host + link);
+      Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]));
+      return url;
+    },
     breadcrumbs: function () {
       let breadcrumbs = [
         {
@@ -86,41 +98,45 @@ export default {
           url: "/#/catalog/" + this.category.alias,
         };
       }
+
       return breadcrumbs;
     },
+    fetchFilter: function () {
+
+      if (!this.$route.params.alias) {
+        this.filters = null;
+        this.category = null;
+        return;
+      }
+
+      let path = "/v1/catalog/filter/" + this.$route.params.alias;
+
+      fetch(this.getUrl(path).toString())
+          .then(res => res.json())
+          .then(res => {
+            this.category = res.data.category;
+            this.filters = res.data.filters;
+          });
+    },
     fetchMedicine: function () {
-
-      let link = this.$route.params.alias ? "/v1/catalog/category/" + this.$route.params.alias : "/v1/catalog";
-      let url = new URL(window.location.protocol + "//" + window.location.host + link);
-      this.category = this.$route.params.alias ? this.category : null;
-      this.filter = this.$route.params.alias ? this.filter : null;
-
-      Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]))
-
-      if (this.$route.params.alias) {
-        fetch("/v1/catalog/filter/" + this.$route.params.alias)
-            .then(res => res.json())
-            .then(res => {
-              this.category = res.data.category;
-              this.filter = res.data;
-            });
-      }
-
-      if (!this.categories.length) {
-        fetch("/v1/catalog/categories")
-            .then(res => res.json())
-            .then(res => {
-              this.categories = res.data;
-            });
-      }
-
-      fetch(url.toString())
+      let path = this.$route.params.alias ? "/v1/catalog/category/" + this.$route.params.alias : "/v1/catalog"
+      fetch(this.getUrl(path).toString())
           .then(res => res.json())
           .then(res => {
             this.medicines = res.data.content;
             this.totalPages = res.data.totalPages;
             this.currentPage = res.data.number ? res.data.number : 0;
             window.scrollTo(0, 0);
+          });
+    },
+    fetchCategories: function () {
+
+      if (this.$route.params.alias || this.categories.length) return;
+
+      fetch("/v1/catalog/categories")
+          .then(res => res.json())
+          .then(res => {
+            this.categories = res.data;
           });
     }
   }

@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecificationExecutor<Tag> {
+public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecificationExecutor<Tag>, TagRepositoryCustom {
 
     @EntityGraph(attributePaths = {"vocabulary"})
     public Optional<Tag> findOneByAlias(String alias);
