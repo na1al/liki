@@ -58,7 +58,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
                 tag.get("name"),
                 tag.get("alias"),
                 tag.get("tagVocabularyId"),
-                cb.count(tag.get("id"))
+                cb.countDistinct(medicineTag.get("medicineId"))
         )
                 .where(predicates.toArray(new Predicate[0]))
                 .groupBy(tag.get("id"))

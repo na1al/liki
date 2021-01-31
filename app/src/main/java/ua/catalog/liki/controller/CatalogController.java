@@ -73,12 +73,19 @@ public class CatalogController {
     @GetMapping("/catalog/filter/{alias}")
     public Response<Map<String, Object>> filter(@PathVariable("alias") String alias,
                                                 @ModelAttribute(value = "filter") CatalogSearchFilter filter,
+                                                @RequestParam(value = "f", required = false) boolean full,
                                                 Response<Map<String, Object>> model) {
         Tag tag = tagService.findByAlias(alias).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         model.data = new HashMap<>();
         model.data.put("category", tag);
-        model.data.put("filters", catalogService.filter(tag, filter));
+        model.data.put("counts", catalogService.filter(tag, filter));
+        model.data.put("keys", filter.getKey());
+
+        if (full)
+            model.data.put("items", catalogService.filter(tag, new CatalogSearchFilter()));
+
+
         return model;
     }
 

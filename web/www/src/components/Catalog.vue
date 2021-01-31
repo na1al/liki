@@ -11,9 +11,11 @@
 
       <div class="row">
         <div class="d-none d-md-block col-md-3 col-xxl-2">
-          <CategoryWidget v-if="categories && !filters" :categories="categories"/>
-          <FilterWidget v-if="filters"
-                        :filters="filters"
+          <CategoryWidget v-if="categories && !filterItems" :categories="categories"/>
+          <FilterWidget v-if="filterItems"
+                        :filters="filterItems"
+                        :counts="filterCounts"
+                        :keys="filterKeys"
           />
         </div>
         <div class="col-md-9 col-xxl-10">
@@ -55,7 +57,9 @@ export default {
       loading: true,
       category: null,
       categories: [],
-      filters: null,
+      filterItems: null,
+      filterCounts: null,
+      filterKeys: null,
       medicines: [],
       currentPage: 1,
       totalPages: null
@@ -75,9 +79,10 @@ export default {
       this.fetchCategories();
       this.fetchFilter();
     },
-    getUrl: function (link) {
+    getUrl: function (link, additionalQueryParams = {}) {
       let url = new URL(window.location.protocol + "//" + window.location.host + link);
       Object.keys(this.$route.query).forEach(key => url.searchParams.append(key, this.$route.query[key]));
+      Object.keys(additionalQueryParams).forEach(key => url.searchParams.append(key, additionalQueryParams[key]));
       return url;
     },
     breadcrumbs: function () {
@@ -104,18 +109,20 @@ export default {
     fetchFilter: function () {
 
       if (!this.$route.params.alias) {
-        this.filters = null;
+        this.filterItems = null;
         this.category = null;
         return;
       }
 
       let path = "/v1/catalog/filter/" + this.$route.params.alias;
-
-      fetch(this.getUrl(path).toString())
+      let additional = this.filterItems === null ? {f: 1} : {}
+      fetch(this.getUrl(path, additional).toString())
           .then(res => res.json())
           .then(res => {
             this.category = res.data.category;
-            this.filters = res.data.filters;
+            this.filterItems = res.data.items ? res.data.items : this.filterItems;
+            this.filterCounts = res.data.counts;
+            this.filterKeys = res.data.keys;
           });
     },
     fetchMedicine: function () {
