@@ -25,6 +25,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
         this.em = entityManager;
     }
 
+
     @Override
     public List<Filter> filter(Tag category, CatalogSearchFilter filter) {
 
@@ -35,7 +36,6 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
         Root<Tag> tag = cq.from(Tag.class);
         Root<MedicineTag> medicineTag = cq.from(MedicineTag.class);
         Join<MedicineTag, MedicineTag> selfMedicineTag = medicineTag.join("selfMedicineTag");
-
 
         Set<Predicate> predicates = new HashSet<>();
         predicates.add(cb.equal(tag.get("id"), medicineTag.get("tag")));
