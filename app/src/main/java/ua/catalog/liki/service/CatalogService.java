@@ -12,7 +12,6 @@ import ua.catalog.liki.repository.MedicineViewsRepository;
 import ua.catalog.liki.repository.TagRepository;
 import ua.catalog.liki.repository.specification.CatalogMedicineSpecification;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
 @Service
@@ -23,11 +22,13 @@ public class CatalogService {
     private MedicineRepository medicineRepository;
     private MedicineViewsRepository medicineViewsRepository;
     private final TagRepository tagRepository;
+    private TagVocabularyService tagVocabularyService;
 
-    public CatalogService(MedicineRepository medicineRepository, MedicineViewsRepository medicineViewsRepository, TagRepository tagRepository, EntityManager entityManager) {
+    public CatalogService(MedicineRepository medicineRepository, MedicineViewsRepository medicineViewsRepository, TagRepository tagRepository, TagVocabularyService tagVocabularyService) {
         this.medicineRepository = medicineRepository;
         this.medicineViewsRepository = medicineViewsRepository;
         this.tagRepository = tagRepository;
+        this.tagVocabularyService = tagVocabularyService;
     }
 
     public List<Medicine> topMedicines() {
@@ -45,6 +46,10 @@ public class CatalogService {
 
     public List<Filter> filter(Tag category, CatalogSearchFilter filter) {
         return tagRepository.filter(category, filter);
+    }
+
+    public List<Filter> count(Tag category, CatalogSearchFilter filter) {
+        return tagRepository.count(category, filter, tagVocabularyService.findAll());
     }
 
     public Optional<Medicine> viewByAlias(String alias) {

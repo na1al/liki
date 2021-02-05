@@ -9,7 +9,7 @@
           <input class="form-check-input" type="checkbox" v-bind:value="item.id"
                  v-bind:id="'filter-item-checkbox'+item.id" v-model="checked" v-on:change="onFilterClick">
           <label class="form-check-label" v-bind:for="'filter-item-checkbox'+item.id">
-            {{ item.name }}({{ group.active && group._counts[item.id] !== item.count ? '+' + item.count : item.count }})
+            {{ item.name }}({{ group.active && group._counts[item.id] !== item.count ? '' + item.count : item.count }})
           </label>
         </div>
 
@@ -86,7 +86,8 @@ class FilterGroup {
             this.items[id].count = count.count;
           } else if (this.items[id].tagVocabularyId === key.tagVocabularyId) {
             this.active = true;
-            this.items[id].count = this._counts[id] - count.count;
+           // this.items[id].count = this._counts[id] - count.count;
+            this.items[id].count = count.count;
           } else {
             this.items[id].count = count.count;
           }
@@ -161,7 +162,7 @@ export default {
           .then(res => res.json())
           .then(res => {
             let grouped = this._group(this.filters, 'tagVocabularyId');
-            this.filtersGroups = res.data.map(vocabulary => new FilterGroup(vocabulary, grouped[vocabulary.id] ? grouped[vocabulary.id] : {}));
+            this.filtersGroups = res.data.map(vocabulary => new FilterGroup(vocabulary, grouped[vocabulary.id] ? grouped[vocabulary.id] : []));
           });
     },
     _keys: function () {
