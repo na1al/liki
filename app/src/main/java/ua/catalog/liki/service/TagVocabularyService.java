@@ -21,7 +21,7 @@ public class TagVocabularyService {
     }
 
     public List<TagVocabulary> findAll() {
-        return tagVocabularyRepository.findAll();
+        return tagVocabularyRepository.findAllByOrderByPriorityAsc();
     }
 
 }

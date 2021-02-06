@@ -24,6 +24,9 @@ public class TagVocabulary extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @Basic
+    private Integer priority;
+
     public enum Type {
         CATEGORY, MANUFACTURER, FORM, RECIPE, WHOM
     }

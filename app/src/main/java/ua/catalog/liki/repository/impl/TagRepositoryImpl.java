@@ -56,7 +56,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
             }
 
             query
-                    .append("SELECT t0_.id, t0_.name, t0_.alias, t0_.tag_vocabulary_id, count(m0_.medicine_id) as count ")
+                    .append("SELECT t0_.id, t0_.name, t0_.alias, t0_.tag_vocabulary_id, count(DISTINCT m0_.medicine_id) as count ")
                     .append(" FROM tag t0_ ")
                     .append(join)
                     .append(where)

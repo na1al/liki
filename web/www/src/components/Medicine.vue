@@ -38,7 +38,7 @@
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-          <div class="alert alert-success mt-4" role="alert" v-else-if="!this.prices || !this.prices.size">
+          <div class="alert alert-success mt-4" role="alert" v-else-if="!this.prices">
             <h4 class="alert-heading">{{ medicine.name }}</h4>
             <p>Данний препарат незнайдений в жодній із аптек.</p>
             <hr>
@@ -52,34 +52,37 @@
           </div>
 
 
-          <div v-if="this.prices && this.prices.size" class="mt-5">
+          <div v-if="this.prices" class="mt-5">
 
 
             <div class="accordion" id="accordionExample">
 
-              <div class="accordion-item" v-for="group in prices.values()">
+              <div class="accordion-item" v-for="group in prices">
 
-                <h2 class="accordion-header" id="headingOne">
+
+                <h2 class="accordion-header" id="headingOne" >
                   <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                          v-bind:data-bs-target="'#collapse'+group.pharmacy.id.integrationId" aria-expanded="true"
-                          aria-controls="collapseOne">
+                          v-bind:data-bs-target="'#collapse'+group.id" aria-expanded="true"
+                          aria-controls="collapseOne" style="background-color: #f8f9fa;">
 
-                    <img src="/empty.png" v-bind:src="'/logos/'+group.pharmacy.id.integrationId+'.jpg'"
+                    <img src="/empty.png" v-bind:src="'/logos/'+group.id+'.jpg'"
                          class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
-                    {{ group.pharmacy.name }} <span class="fw-bold ms-auto"> від {{
-                      group.minPrice | formatPrice
+                    {{ group.name }} <span class="fw-bold ms-auto"> від {{
+                      group.price | formatPrice
                     }} </span>
                   </button>
                 </h2>
 
-                <div v-bind:id="'collapse'+group.pharmacy.id.integrationId" class="accordion-collapse collapse"
+
+                <div v-bind:id="'collapse'+group.id" class="accordion-collapse collapse"
                      aria-labelledby="headingOne" data-bs-parent="#accordionExample">
 
 
                   <div class="d-flex position-relative border-bottom p-3 " style="cursor: pointer"
                        v-for="item in group.items" v-if="item.pharmacy.lat"
-                       v-on:click="showInfoWindow(item.index)">
-                    <img src="/empty.png" v-bind:src="'/logos/'+item.pharmacy.id.integrationId+'.jpg'"
+                       v-on:click="showInfoWindow(item.index)"
+                       v-bind:class="{active: item.index}">
+                    <img src="/empty.png" v-bind:src="'/logos/'+group.id+'.jpg'"
                          class="flex-shrink-0 rounded me-3" alt="..." width="40" height="40">
                     <div>
                       <h5 class="mt-0">{{ item.pharmacy.name }}</h5>
@@ -91,6 +94,7 @@
 
 
                 </div>
+
 
               </div>
 
@@ -206,37 +210,22 @@ export default {
           });
     },
     _getPrices: function (data) {
-      let prices = new Map();
-      data.forEach((item, i) => {
-
-        let groupId = item.pharmacy.id.integrationId;
-
-        if (!prices.has(groupId)) {
-          prices.set(groupId, {
-            pharmacy: item.pharmacy,
-            minPrice: 0,
-            items: []
-          })
-        }
-
-        let group = prices.get(groupId);
-        item.index = i;
-        group.items[group.items.length] = item;
-
-        if (!group.minPrice || group.minPrice < item.price) {
-          group.pharmacy = item.pharmacy;
-          group.minPrice = item.price;
-        }
-
-      });
-
-      return prices;
+      return  data.reduce(function (r, o, i) {
+        let k = o.pharmacy.id.integrationId;
+        o.index = i;
+        r[k] = r[k] || {};
+        r[k].id = o.pharmacy.id.integrationId;
+        r[k].name = o.pharmacy.name;
+        r[k].price = !r[k].price || r[k].price > o.price ? o.price : r[k].price;
+        (r[k].items = r[k].items || []).push(o);
+        return r;
+      }, {});
     },
-
     _getMarkers: function (data) {
+      let re = /(\(\d{3}\))/g;
       return data.map(item => {
         return {
-          content: '<h5>' + item.pharmacy.name + '</h5><p>' + item.pharmacy.address + '</p><p>' + (item.pharmacy.phone ? item.pharmacy.phone : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(item.price) + '</div>',
+          content: '<h5>' + item.pharmacy.name + '</h5><p>' + item.pharmacy.address + '</p><p>' + (item.pharmacy.phone ? item.pharmacy.phone.replace(re,'<span class="fw-bold">$1</span>') : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(item.price) + '</div>',
           position: {
             lat: item.pharmacy.lat,
             lng: item.pharmacy.lng,
@@ -244,7 +233,6 @@ export default {
         }
       });
     },
-
     _getCategoryFromMedicine: function (medicine) {
       return medicine.tag.find(v => v.vocabulary.id === TAG.TYPE_CATEGORY);
     }

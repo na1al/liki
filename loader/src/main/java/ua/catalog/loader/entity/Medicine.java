@@ -14,6 +14,8 @@ public class Medicine {
 
     private String alias;
 
+    private int priority = 0;
+
     private Integer mediaId;
 
     private String description;

@@ -41,41 +41,21 @@ class FilterGroup {
 
   updateCounts(keys, counts) {
 
-    this.active = false;
+    // this.active = false;
 
     for (let index in this._counts) {
       if (this.items.hasOwnProperty(index)) {
-        this.items[index].count = this._counts[index];
+        this.items[index].count = !keys ? this._counts[index] : 0;
       }
     }
 
     if (!keys) {
-
       return;
     }
 
-    let uniq = {};
-    // let reduceKeys = keys.filter(function (item) {
-    //   return uniq.hasOwnProperty(item.tagVocabularyId) ? false : (uniq[item.tagVocabularyId] = true);
-    // });
-
-
-    let reduceKeys = keys;
-
-    for (let key of reduceKeys) {
-      for (let id in this.items) {
-        if (this.items.hasOwnProperty(id)) {
-          if (this.items[id].tagVocabularyId !== key.tagVocabularyId) {
-            this.items[id].count = 0;
-          }
-        }
-      }
-    }
-
-
     let keyIds = keys.map(v => v.id);
 
-    for (let key of reduceKeys) {
+    for (let key of keys) {
 
       for (let count of counts) {
 
@@ -86,7 +66,7 @@ class FilterGroup {
             this.items[id].count = count.count;
           } else if (this.items[id].tagVocabularyId === key.tagVocabularyId) {
             this.active = true;
-           // this.items[id].count = this._counts[id] - count.count;
+            // this.items[id].count = this._counts[id] - count.count;
             this.items[id].count = count.count;
           } else {
             this.items[id].count = count.count;
@@ -105,7 +85,8 @@ export default {
   props: {
     filters: Array,
     counts: null,
-    keys: Array
+    tags: Array,
+    exclude: Array,
   },
   data() {
     return {
@@ -137,22 +118,7 @@ export default {
     onUpdateCounts: function (n, o) {
       if (o === null) return;
       let grouped = this._group(n, 'tagVocabularyId');
-
-
-      let keys = [];
-
-      if (this.keys) {
-        let sorting = this._keys();
-        keys = this.keys.map(function (item) {
-          let n = sorting.indexOf(item.id);
-          sorting[n] = '';
-          return [n, item]
-        }).sort().map(function (j) {
-          return j[1]
-        });
-      }
-
-      this.filtersGroups.forEach(g => g.updateCounts(keys, grouped[g.vocabulary.id] ? grouped[g.vocabulary.id] : []));
+      this.filtersGroups.forEach(g => g.updateCounts(this.tags, grouped[g.vocabulary.id] ? grouped[g.vocabulary.id] : []));
     },
     fetchInputParams: function () {
       this.checked = this._keys();
@@ -161,8 +127,13 @@ export default {
       fetch("/v1/vocabulary")
           .then(res => res.json())
           .then(res => {
-            let grouped = this._group(this.filters, 'tagVocabularyId');
-            this.filtersGroups = res.data.map(vocabulary => new FilterGroup(vocabulary, grouped[vocabulary.id] ? grouped[vocabulary.id] : []));
+            let filters = this._group(this.filters, 'tagVocabularyId');
+            let counts = this._group(this.counts, 'tagVocabularyId');
+            this.filtersGroups = res.data.filter(v => !this.exclude.includes(v.id)).map(vocabulary => {
+              let filter = new FilterGroup(vocabulary, filters[vocabulary.id] ? filters[vocabulary.id] : []);
+              filter.updateCounts(this.tags, counts[vocabulary.id] ? counts[vocabulary.id] : []);
+              return filter;
+            });
           });
     },
     _keys: function () {

@@ -23,6 +23,7 @@ services:
 #    network_mode: host
     volumes:
       - ./web/www/package.json:/www/package.json
+      - ./web/www/index.html:/www/index.html
       - ./web/www/src:/www/src
       - ./web/www/config:/www/config
     ports:

@@ -15,10 +15,16 @@
           <FilterWidget v-if="filterItems"
                         :filters="filterItems"
                         :counts="filterCounts"
-                        :keys="filterKeys"
+                        :tags="filterTags"
+                        :exclude="filterExclude"
           />
         </div>
         <div class="col-md-9 col-xxl-10">
+
+          <FilterHeaderWidget v-if="category"
+                              :tags="filterTags"
+                              :category="category"
+          />
 
           <div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-xs-1"
                v-if="medicines">
@@ -49,9 +55,17 @@ import Pager from './widgets/PagerWidget'
 import Breadcrumb from './widgets/BreadcrumbWidget'
 import MedicineCard from "./MedicineCard";
 import CategoryWidget from "./widgets/CategoryWidget";
+import FilterHeaderWidget from "./widgets/FilterHeaderWidget";
 import FilterWidget from "./widgets/FilterWidget";
 
 export default {
+  metaInfo: {
+    meta: [{
+      vmid: 'robots',
+      name: 'robots',
+      content: 'noindex, follow', //TODO: check. not working. make dynamic
+    }]
+  },
   data() {
     return {
       loading: true,
@@ -59,13 +73,14 @@ export default {
       categories: [],
       filterItems: null,
       filterCounts: null,
-      filterKeys: null,
+      filterTags: null,
+      filterExclude: [1],
       medicines: [],
       currentPage: 1,
       totalPages: null
     }
   },
-  components: {Search, CategoryWidget, FilterWidget, Pager, Breadcrumb, MedicineCard},
+  components: {Search, CategoryWidget, FilterWidget, FilterHeaderWidget, Pager, Breadcrumb, MedicineCard},
   created() {
     this.loading = true;
     this.init();
@@ -122,7 +137,7 @@ export default {
             this.category = res.data.category;
             this.filterItems = res.data.items ? res.data.items : this.filterItems;
             this.filterCounts = res.data.counts;
-            this.filterKeys = res.data.keys;
+            this.filterTags = res.data.tags;
           });
     },
     fetchMedicine: function () {

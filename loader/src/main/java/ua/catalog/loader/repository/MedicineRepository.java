@@ -65,7 +65,7 @@ public class MedicineRepository extends AbstractRepository implements BatchInser
             return;
         }
 
-        PreparedStatement ps = connection.prepareStatement("INSERT INTO medicine  (id, name, description, alias) VALUES  (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE " +
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO medicine  (id, name, priority, description, alias) VALUES  (?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE " +
                 "  SET name = excluded.name, " +
                 "      description = excluded.description;");
 
@@ -74,8 +74,9 @@ public class MedicineRepository extends AbstractRepository implements BatchInser
         for (Medicine item : items) {
             ps.setInt(1, item.getId());
             ps.setString(2, item.getName());
-            ps.setString(3, item.getDescription());
-            ps.setString(4, item.getAlias());
+            ps.setInt(3, item.getPriority());
+            ps.setString(4, item.getDescription());
+            ps.setString(5, item.getAlias());
             ps.addBatch();
         }
 

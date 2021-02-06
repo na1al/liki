@@ -25,8 +25,4 @@ public class SearchController {
         return model;
     }
 
-    private void ss(){
-
-    }
-
 }

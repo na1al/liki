@@ -43,8 +43,8 @@ public class Main {
        // (new SearchCommand()).run();
       //  (new PriorityCommand()).run();
        // (new PriceCacheCommand()).run();
-       // (new SearchCommand()).run();
-        (new ImportCommand()).run();
+        (new SearchCommand()).run();
+//        (new ImportCommand()).run();
 
         if (cmd.hasOption("c")) {
 

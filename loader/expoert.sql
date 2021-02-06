@@ -1,4 +1,4 @@
--- medicine
+-- Medicine
 select id,
        substring(CASE WHEN name_local = '' || name_local IS NULL THEN name ELSE name_local END, 1, 255) as name,
        unique_number                                                                                    as code_ua,
@@ -13,6 +13,7 @@ select id,
 from medicine
 where (name_local != '' or name != '');
 
+-- Partner medicine
 
 select mp.medicine_id                                                                                external_medicine_id,
        substring(CASE WHEN name_ua = '' || name_ua IS NULL THEN name_ru ELSE name_ua END, 1, 255) as name,
@@ -40,6 +41,9 @@ select pharmacy_id as integration_id,
        branch_id   as external_pharmacy_id,
        name,
        address,
+       phone,
+       branch_location_lat as lat,
+       branch_location_lng as lng,
        CASE
            WHEN city_id = 1 THEN 1116
            WHEN city_id = 7 THEN 371
@@ -73,7 +77,7 @@ from pharmacy_affiliate
 where pharmacy_id > 0;
 
 
--- Tags
+-- MedicineTag
 
 select p.medicine_id, p.popular_category_id as external_tag_id, 'CATEGORY' as type
 from popular_category_medicine p
@@ -108,7 +112,7 @@ from medicine_filter_value m
          inner join filter_value fv on m.filter_value_id = fv.id
 where filter_id = 11;
 
--- MedicineTag
+-- Tag
 
 select model_id as external_id, value as name, 'CATEGORY' as type
 from translation

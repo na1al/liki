@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import VueMeta from 'vue-meta'
 import App from './App'
 import router from './router'
 
@@ -14,6 +15,9 @@ new Vue({
     template: '<App/>',
 });
 
+Vue.use(VueMeta, {
+    refreshOnceOnNavigation: true
+})
 
 Vue.filter('truncate', function (text, length, clamp) {
     clamp = clamp || '...';
@@ -28,10 +32,3 @@ Vue.filter('formatPrice', function (text, length, clamp) {
     node.innerHTML = (parseInt(text) / 100).toFixed(2) + ' грн.';
     return node.textContent;
 });
-
-// Vue.filter('striphtml', function (value) {
-//   var div = document.createElement("div");
-//   div.innerHTML = value;
-//   var text = div.textContent || div.innerText || "";
-//   return text;
-// });

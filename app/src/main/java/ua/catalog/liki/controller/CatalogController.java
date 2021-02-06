@@ -79,7 +79,7 @@ public class CatalogController {
         model.data = new HashMap<>();
         model.data.put("category", tag);
         model.data.put("counts", catalogService.count(tag, filter));
-        model.data.put("keys", filter.getKey());
+        model.data.put("tags", filter.getKey());
 
         if (full)
             model.data.put("items", catalogService.filter(tag, new CatalogSearchFilter()));
