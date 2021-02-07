@@ -20,7 +20,7 @@ public class CatalogMedicineSpecification implements Specification<Medicine> {
     public CatalogSearchFilter filter;
 
     @Override
-    public Predicate toPredicate(Root<Medicine> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<Medicine> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 
         Class<?> clazz = query.getResultType();
         if (clazz.equals(Medicine.class)) {
@@ -31,7 +31,7 @@ public class CatalogMedicineSpecification implements Specification<Medicine> {
 
         if (filter.getCategory() != null) {
             Join<Medicine, MedicineTag> medicineTag = root.join("medicineTag");
-            predicates.add(criteriaBuilder.equal(medicineTag.get("tag"), filter.getCategory().getId()));
+            predicates.add(cb.equal(medicineTag.get("tag"), filter.getCategory().getId()));
         }
 
 
@@ -52,6 +52,8 @@ public class CatalogMedicineSpecification implements Specification<Medicine> {
             }
         }
 
-        return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        query.orderBy(cb.desc(root.get("priority")));
+
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }

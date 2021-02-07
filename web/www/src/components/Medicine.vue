@@ -33,6 +33,18 @@
           </div>
 
 
+          <div class="row row-cols-xxl-2 mt-4" v-if="tags">
+            <div class="col mb-3" v-for="group in tags">
+              <div class="fs-6 text-decoration-none mb-2">{{ group.name }}</div>
+
+              <ul>
+                <li v-for="item in group.items">{{item.name}}</li>
+              </ul>
+
+            </div>
+          </div>
+
+
           <div class="text-center" v-if="loading">
             <div class="spinner-border" role="status">
               <span class="visually-hidden">Loading...</span>
@@ -60,7 +72,7 @@
               <div class="accordion-item" v-for="group in prices">
 
 
-                <h2 class="accordion-header" id="headingOne" >
+                <h2 class="accordion-header" id="headingOne">
                   <button class="accordion-button" type="button" data-bs-toggle="collapse"
                           v-bind:data-bs-target="'#collapse'+group.id" aria-expanded="true"
                           aria-controls="collapseOne" style="background-color: #f8f9fa;">
@@ -142,6 +154,7 @@ export default {
       loading: true,
       alias: null,
       medicine: null,
+      tags: null,
       category: null,
       markers: [],
       showMarkerId: null,
@@ -188,13 +201,13 @@ export default {
       this.showMarkerId = parseInt(index);
     },
     fetchMedicine: function () {
-      let that = this;
       this.alias = this.$route.params.alias
       fetch('/v1/medicine/alias/' + this.alias)
           .then(res => res.json())
           .then(res => {
             this.medicine = res.data;
-            this.category = that._getCategoryFromMedicine(this.medicine);
+            this.category = this._getCategoryFromMedicine(this.medicine);
+            this.tags = this._groupTags(this.medicine.tag);
             this.fetchMedicinePrices();
           });
     },
@@ -210,7 +223,7 @@ export default {
           });
     },
     _getPrices: function (data) {
-      return  data.reduce(function (r, o, i) {
+      return data.reduce(function (r, o, i) {
         let k = o.pharmacy.id.integrationId;
         o.index = i;
         r[k] = r[k] || {};
@@ -225,13 +238,23 @@ export default {
       let re = /(\(\d{3}\))/g;
       return data.map(item => {
         return {
-          content: '<h5>' + item.pharmacy.name + '</h5><p>' + item.pharmacy.address + '</p><p>' + (item.pharmacy.phone ? item.pharmacy.phone.replace(re,'<span class="fw-bold">$1</span>') : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(item.price) + '</div>',
+          content: '<h5>' + item.pharmacy.name + '</h5><p>' + item.pharmacy.address + '</p><p>' + (item.pharmacy.phone ? item.pharmacy.phone.replace(re, '<span class="fw-bold">$1</span>') : '') + '</p><div class="fw-bold fs-5">' + this.$options.filters.formatPrice(item.price) + '</div>',
           position: {
             lat: item.pharmacy.lat,
             lng: item.pharmacy.lng,
           }
         }
       });
+    },
+    _groupTags: function (data) {
+      return data.reduce(function (r, o) {
+        let k = o.vocabulary.type;
+        r[k] = r[k] || {};
+        r[k].name = o.vocabulary.name;
+        r[k].alias = o.vocabulary.alias;
+        (r[k].items = r[k].items || []).push(o);
+        return r;
+      }, {});
     },
     _getCategoryFromMedicine: function (medicine) {
       return medicine.tag.find(v => v.vocabulary.id === TAG.TYPE_CATEGORY);

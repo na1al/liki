@@ -15,10 +15,6 @@ new Vue({
     template: '<App/>',
 });
 
-Vue.use(VueMeta, {
-    refreshOnceOnNavigation: true
-})
-
 Vue.filter('truncate', function (text, length, clamp) {
     clamp = clamp || '...';
     let node = document.createElement('div');
@@ -32,3 +28,7 @@ Vue.filter('formatPrice', function (text, length, clamp) {
     node.innerHTML = (parseInt(text) / 100).toFixed(2) + ' грн.';
     return node.textContent;
 });
+
+Vue.use(VueMeta, {
+    refreshOnceOnNavigation: true
+})
