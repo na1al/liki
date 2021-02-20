@@ -1,7 +1,7 @@
 <template>
   <MapLoader
       :map-config="mapConfig"
-      apiKey="AIzaSyCybOzOBA-Z0LRO7m-huOKGAl6sYjqeeuo"
+      :api-key="apiKey"
   >
     <template slot-scope="{ google, map }">
       <div v-for="(marker, index) in markers">
@@ -37,7 +37,8 @@ export default {
   },
   props: {
     markers: Array,
-    showMarkerId: Number
+    showMarkerId: Number,
+    apiKey: String
   },
   watch: {
     showMarkerId: function (newVal, oldVal) {

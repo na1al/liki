@@ -30,6 +30,3 @@ services:
       - "8080:8080"
 #    networks:
 #      - backend
-
-networks:
-  backend:

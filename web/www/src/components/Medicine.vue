@@ -124,8 +124,9 @@
     </div>
 
 
-    <div class="map-container" v-if="addressComponentVersion">
+    <div class="map-container" v-if="addressComponentVersion && googleMapApiKey">
       <Addresses
+          :api-key="googleMapApiKey"
           :key="addressComponentVersion"
           :markers="markers"
           :show-marker-id="showMarkerId"
@@ -160,6 +161,7 @@ export default {
       showMarkerId: null,
       prices: null,
       addressComponentVersion: 0,
+      googleMapApiKey: process.env.GOOGLE_MAP_API_KEY
     }
   },
   components: {Search, Addresses, Breadcrumb},
